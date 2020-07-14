@@ -23,6 +23,7 @@ public:
 
 	void PlayAttackMontage();
 	void JumpToAttackMontageSection(int32 NewSection);
+	void SetDeadAnim() { IsDead = true; }
 
 	FOnNextAttackCheckDelegate OnNextAttackCheck;
 	FOnAttackHitCheckDelegate OnAttackHitCheck;
@@ -44,4 +45,7 @@ private:
 	void AnimNotify_NextAttackCheck();
 
 	FName GetAttackMontageSectionName(int32 Section);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Pawn, Meta = (AllowPrivateAccess = true))
+	bool IsDead;
 };

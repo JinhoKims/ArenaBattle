@@ -14,13 +14,12 @@ class ARENABATTLE_API AABCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AABCharacter();
-
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void PostInitializeComponents() override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	USpringArmComponent* SpringArm;
@@ -28,6 +27,11 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	UCameraComponent* Camera;
 
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
+	float AttackRange;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
+	float AttackRadius;
 
 protected:
 	// Called when the game starts or when spawned
@@ -57,6 +61,7 @@ private:
 	void Attack();
 	void AttackStartComboState();
 	void AttackEndComboState();
+	void AttackCheck();
 
 	UFUNCTION()
 	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
