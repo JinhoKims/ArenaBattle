@@ -33,6 +33,12 @@ public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = true))
 	float AttackRadius;
 
+	bool CanSetWeapon();
+	void SetWeapon(class AABWeapon* NewWeapon);
+
+	UPROPERTY(VisibleAnywhere, Category=Weapon)
+	class AABWeapon * CurrentWeapon;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
