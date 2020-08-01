@@ -4,7 +4,10 @@
 #include "ABCharacter.h"
 #include "ABAnimInstance.h"
 #include "ABWeapon.h"
+#include "ABCharacterStatComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Components/WidgetComponent.h"
+#include "ABCharacterWidget.h"
 
 // Sets default values
 AABCharacter::AABCharacter()
@@ -14,9 +17,12 @@ AABCharacter::AABCharacter()
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("CAMERA"));
+	CharacterStat = CreateDefaultSubobject<UABCharacterStatComponent>(TEXT("CHARACTERSTAT"));
+	HPBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPBARWIDGET"));
 
 	SpringArm->SetupAttachment(GetCapsuleComponent());
 	Camera->SetupAttachment(SpringArm);
+	HPBarWidget->SetupAttachment(GetMesh());
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -88.0f), FRotator(0.0f, -90.0f, 0.0f));
 	SpringArm->TargetArmLength = 400.0f;
@@ -35,19 +41,25 @@ AABCharacter::AABCharacter()
 		GetMesh()->SetAnimInstanceClass(WARRIOR_ANIM.Class);
 	}
 	SetControlMode(EControlMode::DIABLO);
-
 	ArmLengthSpeed = 3.0f;
 	ArmRotationSpeed = 10.0f;
 	GetCharacterMovement()->JumpZVelocity = 800.0f;
-
 	IsAttacking = false;
 	MaxCombo = 4;
 	AttackEndComboState();
-
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("ABCharacter"));
-
 	AttackRange = 200.0f;
 	AttackRadius = 50.0f;
+
+	HPBarWidget->SetRelativeLocation(FVector(0.0f, 0.0f, 180.0f));
+	HPBarWidget->SetWidgetSpace(EWidgetSpace::Screen);
+	static ConstructorHelpers::FClassFinder<UUserWidget> UI_HUD(TEXT("WidgetBlueprint'/Game/Book/UI/UI_HPBar.UI_HPBar_C'"));
+
+	if (UI_HUD.Succeeded())
+	{
+		HPBarWidget->SetWidgetClass(UI_HUD.Class);
+		HPBarWidget->SetDrawSize(FVector2D(150.0f, 50.0f));
+	}
 }
 
 bool AABCharacter::CanSetWeapon()
@@ -71,18 +83,7 @@ void AABCharacter::SetWeapon(AABWeapon* NewWeapon)
 void AABCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-/*	FName WeaponSocket(TEXT("hand_rSocket"));
-	auto CurWeapon = GetWorld()->SpawnActor<AABWeapon>(FVector::ZeroVector, FRotator::ZeroRotator);
-
-	if (nullptr != CurWeapon)
-	{
-		CurWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
-	}
-*/
-	
 }
-
 
 // Called every frame
 void AABCharacter::Tick(float DeltaTime)
@@ -152,8 +153,24 @@ void AABCharacter::PostInitializeComponents()
 			ABAnim->JumpToAttackMontageSection(CurrentCombo);
 		}
 	});
-
 	ABAnim->OnAttackHitCheck.AddUObject(this, &AABCharacter::AttackCheck);
+
+	CharacterStat->OnHPIsZero.AddLambda([this]()-> void {
+		ABAnim->SetDeadAnim();
+		SetActorEnableCollision(false);
+	});
+
+	HPBarWidget->InitWidget(); // ※ 사용자 위젯이 초기화되었는지 확인 필요!!
+	auto CharacterWidget = Cast<UABCharacterWidget>(HPBarWidget->GetUserWidgetObject());
+
+	if (nullptr != CharacterWidget)
+	{
+		CharacterWidget->BindCharacterStat(CharacterStat);
+	}
+	else
+	{
+		ABLOG_Short(Error);
+	}
 }
 
 float AABCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -161,15 +178,9 @@ float AABCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	ABLOG_Long(Warning, TEXT("Actor : %s took Damage : %f"), *GetName(), FinalDamage);
 
-	if (FinalDamage > 0.0f)
-	{
-		ABAnim->SetDeadAnim();
-		SetActorEnableCollision(false);
-	}
+	CharacterStat->SetDamage(FinalDamage); // 최종 데미지 전달
 	return FinalDamage;
 }
-
-
 
 void AABCharacter::UpDown(float NewAxisValue)
 {
@@ -294,7 +305,7 @@ void AABCharacter::AttackCheck()
 		ECollisionChannel::ECC_GameTraceChannel2,
 		FCollisionShape::MakeSphere(50.0f),
 		Params);
-
+		
 #if ENABLE_DRAW_DEBUG
 	FVector TraceVec = GetActorForwardVector() * AttackRange;
 	FVector Center = GetActorLocation() + TraceVec * 0.5f;
@@ -319,7 +330,7 @@ void AABCharacter::AttackCheck()
 		{
 			ABLOG_Long(Warning, TEXT("Hit Actor Name %s"), *HitResult.Actor->GetName());
 			FDamageEvent DamageEvent;
-			HitResult.Actor->TakeDamage(50.0f, DamageEvent, GetController(), this);
+			HitResult.Actor->TakeDamage(CharacterStat->GetAttack(), DamageEvent, GetController(), this);
 		}
 	}
 }
@@ -331,8 +342,6 @@ void AABCharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted
 	IsAttacking = false;
 	AttackEndComboState();
 }
-
-
 
 void AABCharacter::SetControlMode(EControlMode NewControlMode)
 {
