@@ -7,6 +7,7 @@
 UBTTask_FindPatrolPos::UBTTask_FindPatrolPos()
 {
 	NodeName = TEXT("FindPatrolPos");
+	
 }
 
 
