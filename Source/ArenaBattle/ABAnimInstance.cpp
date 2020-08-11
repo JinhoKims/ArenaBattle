@@ -46,14 +46,15 @@ void UABAnimInstance::JumpToAttackMontageSection(int32 NewSection)
 	Montage_JumpToSection(GetAttackMontageSectionName(NewSection), AttackMontage); // 점프 공격 설정
 }
 
-void UABAnimInstance::AnimNotify_AttackHitCheck() // 애니메이션시 공격판정 델리게이트 호출
-{
-	OnAttackHitCheck.Broadcast();
+void UABAnimInstance::AnimNotify_AttackHitCheck() // 에니메이션에서 (AttackHitCheck)노티파이가 발생하면 실행되는 함수
+{ // 애니메이션 중 노티파이가 발생할 경우 현 함수가 호출되며, 함수 안에서 델리게이트를 호출한다.
+	ABLOG_Long(Error, TEXT("Start Deleagate"));
+	OnAttackHitCheck.Broadcast(); // 델리게이트에 등록한 함수 실행 : ABCharacter.cpp의 ABAnim->OnAttackHitCheck.AddUObject(this, &AABCharacter::AttackCheck);
 }
 
-void UABAnimInstance::AnimNotify_NextAttackCheck()
+void UABAnimInstance::AnimNotify_NextAttackCheck() // 에니메이션에서 (NextAttackCheck)노티파이가 발생하면 실행되는 함수
 {
-	OnNextAttackCheck.Broadcast();
+	OnNextAttackCheck.Broadcast(); // 델리게이트에 등록한 함수 실행 : ABAnim->OnNextAttackCheck.AddLambda([this]() -> ...
 }
 
 FName UABAnimInstance::GetAttackMontageSectionName(int32 Section)

@@ -65,14 +65,14 @@ AABCharacter::AABCharacter()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
-void AABCharacter::PostInitializeComponents() // 초기화 설정
+void AABCharacter::PostInitializeComponents() // 델리게이트 초기화 설정
 {
 	Super::PostInitializeComponents();
 	ABAnim = Cast<UABAnimInstance>(GetMesh()->GetAnimInstance());
 	ABCHECK(nullptr != ABAnim);
-	ABAnim->OnMontageEnded.AddDynamic(this, &AABCharacter::OnAttackMontageEnded);
+	ABAnim->OnMontageEnded.AddDynamic(this, &AABCharacter::OnAttackMontageEnded); // OnMontageEnded 델리게이트는 애니메이션 몽타주에서 생성한 델리게이트
 
-	ABAnim->OnNextAttackCheck.AddLambda([this]() -> void {
+	ABAnim->OnNextAttackCheck.AddLambda([this]() -> void { // OnNextAttck 델리게이트에 등록한 함수, 연속 공격시 델리게이트가 호출함
 
 		ABLOG_Long(Warning, TEXT("OnNextAttackCheck"));
 		CanNextCombo = false;
@@ -83,12 +83,12 @@ void AABCharacter::PostInitializeComponents() // 초기화 설정
 			ABAnim->JumpToAttackMontageSection(CurrentCombo);
 		}
 	});
-	ABAnim->OnAttackHitCheck.AddUObject(this, &AABCharacter::AttackCheck);
+	ABAnim->OnAttackHitCheck.AddUObject(this, &AABCharacter::AttackCheck); // 히트 판정 시 델리게이트가 호출할 함수
 
-	CharacterStat->OnHPIsZero.AddLambda([this]()-> void {
-		ABAnim->SetDeadAnim();
-		SetActorEnableCollision(false);
-	});
+	CharacterStat->OnHPIsZero.AddLambda([this]()-> void { // hp가 0이 될 시 
+		ABAnim->SetDeadAnim(); // isDead = true 죽는 모션
+		SetActorEnableCollision(false); // 콜리전(물리) 비활성화
+	}); // 델리게이트가 호출할 람다식
 
 	HPBarWidget->InitWidget(); // ※ 사용자 위젯이 초기화되었는지 확인 필요!!
 	auto CharacterWidget = Cast<UABCharacterWidget>(HPBarWidget->GetUserWidgetObject());
@@ -288,7 +288,7 @@ void AABCharacter::SetWeapon(AABWeapon* NewWeapon) // 무기 장착
 void AABCharacter::Attack() // 공격
 {
 	ABLOG_Short(Warning);
-	if (IsAttacking)
+	if (IsAttacking) // 이미 공격 중일시 콤보 지속
 	{
 		ABCHECK(FMath::IsWithinInclusive<int32>(CurrentCombo, 1, MaxCombo));
 		if (CanNextCombo)
@@ -296,7 +296,7 @@ void AABCharacter::Attack() // 공격
 			IsComboInputOn = true;
 		}
 	}
-	else
+	else // 첫 공격 시 콤보 시작
 	{
 			ABCHECK(CurrentCombo == 0);
 			AttackStartComboState();
@@ -363,7 +363,7 @@ void AABCharacter::AttackEndComboState() // 콤보 마지막
 	CurrentCombo = 0;
 }
 
-void AABCharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted) // 몽타주가 끝나면 호출되는 델리게이트
+void AABCharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted) // 공격 애니메이션이 끝났으니 IsAttacking 변수를 false로 변경
 {
 	ABCHECK(IsAttacking);
 	ABCHECK(CurrentCombo > 0);

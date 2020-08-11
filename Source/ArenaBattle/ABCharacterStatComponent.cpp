@@ -4,7 +4,6 @@
 #include "ABCharacterStatComponent.h"
 #include "ABGameInstance.h"
 
-
 // Sets default values for this component's properties
 UABCharacterStatComponent::UABCharacterStatComponent()
 {
@@ -42,7 +41,7 @@ void UABCharacterStatComponent::InitializeComponent()
 
 void UABCharacterStatComponent::SetNewLevel(int32 NewLevel) // 레벨 설정 
 {
-	auto ABGameInstance = Cast<UABGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	auto ABGameInstance = Cast<UABGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())); // include GameInstance.h가 필요
 
 	ABCHECK(nullptr != ABGameInstance);
 	CurrentStatData = ABGameInstance->GetABCharacterData(NewLevel);
@@ -67,18 +66,18 @@ void UABCharacterStatComponent::SetDamage(float NewDamage) // 공격(데미지) 받기
 void UABCharacterStatComponent::SetHP(float NewHP)
 {
 	CurrentHP = NewHP;
-	OnHPChanged.Broadcast();
-	if (CurrentHP < KINDA_SMALL_NUMBER)
+	OnHPChanged.Broadcast(); // 캐릭터 hp가 변경되면 델리게이트 브로드캐스팅
+	if (CurrentHP < KINDA_SMALL_NUMBER) // hp가 변경되던 중 피가 0 이하가 될 경우 Zero 델리게이트 호출 
 	{
 		CurrentHP = 0.0f;
-		OnHPIsZero.Broadcast();
+		OnHPIsZero.Broadcast(); 
 	}
 }
 
 float UABCharacterStatComponent::GetAttack() // 공격 하기(데미지 전달)
 {
 	ABCHECK(nullptr != CurrentStatData, 0.0f);
-	return CurrentStatData->Attack;
+	return CurrentStatData->Attack; // 테이블에 저장된 레벨별 공격데미지를 전달
 }
 
 float UABCharacterStatComponent::GetHPRatio()

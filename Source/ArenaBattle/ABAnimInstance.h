@@ -6,6 +6,7 @@
 #include "Animation/AnimInstance.h"
 #include "ABAnimInstance.generated.h"
 
+// 델리게이트 선언, 시그니처 지정
 DECLARE_MULTICAST_DELEGATE(FOnNextAttackCheckDelegate);
 DECLARE_MULTICAST_DELEGATE(FOnAttackHitCheckDelegate);
 
@@ -15,7 +16,7 @@ class ARENABATTLE_API UABAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 								
 public:
-	FOnNextAttackCheckDelegate OnNextAttackCheck;
+	FOnNextAttackCheckDelegate OnNextAttackCheck; 
 	FOnAttackHitCheckDelegate OnAttackHitCheck;
 
 private:
@@ -41,10 +42,10 @@ public:
 
 private:
 	UFUNCTION()
-	void AnimNotify_AttackHitCheck();
+	void AnimNotify_AttackHitCheck(); // ☆ 에니메이션 몽타주 BP에서 노티파이가 실행되면 호출되는 함수!!! ★
 
 	UFUNCTION()
-	void AnimNotify_NextAttackCheck();
+	void AnimNotify_NextAttackCheck();  // 함수 이름은 노티파이명과 동일해야 한다!
 
 	FName GetAttackMontageSectionName(int32 Section);
 };
