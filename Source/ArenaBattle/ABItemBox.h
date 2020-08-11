@@ -24,13 +24,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(VisibleAnywhere, Category = Box)
+	UPROPERTY(VisibleAnywhere, Category = Box) // 조건(트리거)
 	UBoxComponent * Trigger;
 
 	UPROPERTY(VisibleAnywhere, Category = Box)
 	UStaticMeshComponent* Box;
 
-	UPROPERTY(EditInstanceOnly, Category = Box)
+	UPROPERTY(EditInstanceOnly, Category = Box) // 드롭할 무기
 	TSubclassOf<class AABWeapon> WeaponItemClass;
 
 	UPROPERTY(VisibleAnywhere, Category = Effect)

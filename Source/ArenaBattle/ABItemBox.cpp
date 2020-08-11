@@ -19,7 +19,7 @@ AABItemBox::AABItemBox()
 	Box->SetupAttachment(RootComponent);
 	Effect->SetupAttachment(RootComponent);
 
-	Trigger->SetBoxExtent(FVector(40.0f, 42.0f, 30.0f));
+	Trigger->SetBoxExtent(FVector(40.0f, 42.0f, 30.0f)); // 박스 틀 생성
 	Trigger->SetRelativeLocation(FVector(0.0f, 0.0f, 30.0f));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> SM_BOX(TEXT("StaticMesh'/Game/InfinityBladeGrassLands/Environments/Breakables/StaticMesh/Box/SM_Env_Breakables_Box1.SM_Env_Breakables_Box1'"));
 	if (SM_BOX.Succeeded())
@@ -58,11 +58,10 @@ void AABItemBox::PostInitializeComponents()
 void AABItemBox::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AABItemBox::OnCharacterOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
+{	// 오버랩 이벤트 (아이템 획득)
 	ABLOG_Short(Warning);
 
 	auto ABCharacter = Cast<AABCharacter>(OtherActor);
@@ -77,7 +76,7 @@ void AABItemBox::OnCharacterOverlap(UPrimitiveComponent* OverlappedComp, AActor*
 			Effect->Activate(true);
 			Box->SetHiddenInGame(true, true);
 			SetActorEnableCollision(false);
-			Effect->OnSystemFinished.AddDynamic(this, &AABItemBox::OnEffectFinished);
+			Effect->OnSystemFinished.AddDynamic(this, &AABItemBox::OnEffectFinished); // 파티클 컴포넌트 시스템에서 제공하는 델리게이트에 연결해 이펙트 재생이 종료되면 Finished() 호출
 		}
 		else
 		{

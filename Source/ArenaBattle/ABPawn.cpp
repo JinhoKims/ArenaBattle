@@ -43,16 +43,6 @@ void AABPawn::BeginPlay()
 {
 	Super::BeginPlay();
 	ABLOG_Short(Warning);
-
-/*	Mesh->SetAnimationMode(EAnimationMode::AnimationSingleNode); // 애니메이션 로드 명령어
-	UAnimationAsset* AnimAsset = LoadObject<UAnimationAsset>(nullptr, TEXT("AnimSequence'/Game/Animations/WarriorRun.WarriorRun'"));
-	if (AnimAsset != nullptr)
-	{
-		Mesh->PlayAnimation(AnimAsset, true); // 애니메이션 실행 (false = 1회만 시행)
-	} 
-*/
-
-
 }
 
 // Called every frame
