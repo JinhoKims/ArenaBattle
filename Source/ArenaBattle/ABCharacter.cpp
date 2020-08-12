@@ -55,7 +55,7 @@ AABCharacter::AABCharacter()
 	HPBarWidget->SetWidgetSpace(EWidgetSpace::Screen);
 	static ConstructorHelpers::FClassFinder<UUserWidget> UI_HUD(TEXT("WidgetBlueprint'/Game/Book/UI/UI_HPBar.UI_HPBar_C'"));
 
-	if (UI_HUD.Succeeded()) // HUD 설정
+	if (UI_HUD.Succeeded()) // HUD 설정, ABCharacter에서는 HP바의 기능을 구현하기보다, 출력할 위치 설정과 드로우를 담당한다.
 	{
 		HPBarWidget->SetWidgetClass(UI_HUD.Class);
 		HPBarWidget->SetDrawSize(FVector2D(150.0f, 50.0f));
@@ -90,7 +90,7 @@ void AABCharacter::PostInitializeComponents() // 델리게이트 초기화 설정
 		SetActorEnableCollision(false); // 콜리전(물리) 비활성화
 	}); // 델리게이트가 호출할 람다식
 
-	HPBarWidget->InitWidget(); // ※ 사용자 위젯이 초기화되었는지 확인 필요!!
+	HPBarWidget->InitWidget(); // ※ 4.25 버전 추가사항 : 사용자 위젯이 초기화되었는지 확인 필요!! UI 초기화는 BeginPlay()에서 호출되므로 미리 확인 필요
 	auto CharacterWidget = Cast<UABCharacterWidget>(HPBarWidget->GetUserWidgetObject());
 
 	if (nullptr != CharacterWidget)
