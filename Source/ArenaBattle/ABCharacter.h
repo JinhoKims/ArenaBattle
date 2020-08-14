@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "ABCharacter.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FOnAttackEndDelegate);
+
 UCLASS()
 class ARENABATTLE_API AABCharacter : public ACharacter
 {
@@ -37,7 +39,8 @@ protected:
 	enum class EControlMode
 	{
 		GTA,
-		DIABLO
+		DIABLO,
+		NPC
 	};
 	EControlMode CurrentControlMode = EControlMode::GTA;
 	FVector DirectionToMove = FVector::ZeroVector;
@@ -76,6 +79,9 @@ public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	void SetWeapon(class AABWeapon* NewWeapon);
 	bool CanSetWeapon();
+	virtual void PossessedBy(AController* NewController) override;
+	void Attack();
+	FOnAttackEndDelegate OnAttackEnd;
 
 protected:
 	virtual void BeginPlay() override;
@@ -90,7 +96,6 @@ private:
 	void LookUp(float NewAxisValue);
 	void Turn(float NewAxisValue);
 	void ViewChange();
-	void Attack();
 	void AttackStartComboState();
 	void AttackEndComboState();
 	void AttackCheck();

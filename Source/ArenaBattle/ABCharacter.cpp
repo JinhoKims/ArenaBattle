@@ -188,6 +188,12 @@ void AABCharacter::SetControlMode(EControlMode NewControlMode) // 모드별 설정
 		GetCharacterMovement()->bUseControllerDesiredRotation = true;
 		GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.0f, 0.0f);
 		break;
+	case EControlMode::NPC:
+		bUseControllerRotationYaw = false;
+		GetCharacterMovement()->bUseControllerDesiredRotation = false;
+		GetCharacterMovement()->bOrientRotationToMovement = true;
+		GetCharacterMovement()->RotationRate = FRotator(0.0f, 480.0f, 0.0f);
+		break;
 	}
 }
 
@@ -271,6 +277,21 @@ void AABCharacter::ViewChange() // 카메라 모드 토글
 bool AABCharacter::CanSetWeapon()
 {
 	return (nullptr == CurrentWeapon);
+}
+
+void AABCharacter::PossessedBy(AController* NewController) // 캐릭터의 빙의자가 누구인가(플레이어,npc), 기본 카메라 타입과 이동속도를 설정 
+{
+	Super::PossessedBy(NewController);
+	if (IsPlayerControlled()) // 플레이어가 컨트롤할 경우
+	{
+		SetControlMode(EControlMode::DIABLO);
+		GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	}
+	else // AI가 컨트롤 할 경우
+	{
+		SetControlMode(EControlMode::NPC);
+		GetCharacterMovement()->MaxWalkSpeed = 300.0f; // 플레이어보다 좀 느리게
+	}
 }
 
 void AABCharacter::SetWeapon(AABWeapon* NewWeapon) // 무기 장착
@@ -369,6 +390,7 @@ void AABCharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted
 	ABCHECK(CurrentCombo > 0);
 	IsAttacking = false;
 	AttackEndComboState();
+	OnAttackEnd.Broadcast();
 }
 
 float AABCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) // 데미지 계산
