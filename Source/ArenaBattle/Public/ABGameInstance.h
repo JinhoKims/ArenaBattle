@@ -5,6 +5,7 @@
 #include "ArenaBattle.h"
 #include "Engine/DataTable.h"
 #include "Engine/GameInstance.h"
+#include "Engine/StreamableManager.h"
 #include "ABGameInstance.generated.h"
 
 USTRUCT(BlueprintType)
@@ -44,6 +45,7 @@ public:
 
 	virtual void Init() override;
 	FABCharacterData* GetABCharacterData(int32 Level);
+	FStreamableManager StreamableManager; // 비동기 방식으로 애셋을 로딩하는 클래스
 
 private:
 	UPROPERTY()

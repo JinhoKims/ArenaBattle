@@ -8,6 +8,8 @@
 #include "Components/WidgetComponent.h"
 #include "ABCharacterWidget.h"
 #include "ABAIController.h"
+#include "ABCharacterSetting.h" // 데이터
+#include "ABGameInstance.h" // 명령어
 
 // 초기화 및 프레임별 설정
 AABCharacter::AABCharacter()
@@ -63,6 +65,8 @@ AABCharacter::AABCharacter()
 
 	AIControllerClass = AABAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	
 }
 
 void AABCharacter::PostInitializeComponents() // 델리게이트 초기화 설정
@@ -106,6 +110,19 @@ void AABCharacter::PostInitializeComponents() // 델리게이트 초기화 설정
 void AABCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (!IsPlayerControlled()) // 플레이어가 아닐 경우
+	{
+		auto DefaultSetting = GetDefault<UABCharacterSetting>(); // ini파일을 불러옴
+		int32 RandIndex = FMath::RandRange(0, DefaultSetting->CharacterAssets.Num() - 1); // 파일 길이 만큼의 범위로 랜덤 난수 지정
+		CharacterAssetToLoad = DefaultSetting->CharacterAssets[RandIndex]; // 랜덤 인덱스를 사용하여 무작위 캐릭터 애셋 로드
+
+		auto ABGameInstance = Cast<UABGameInstance>(GetGameInstance()); // StreamableManager를 사용하기 위해 GameInstance 클래스 파일을 객체화(캐스팅)
+		if (nullptr != ABGameInstance)
+		{ // 비동기 방식으로 애셋을 로딩할 때 델리게이트(OnAssetLoadCompleted)를 호출하도록 등록
+			AssetStreamingHandle = ABGameInstance->StreamableManager.RequestAsyncLoad(CharacterAssetToLoad, FStreamableDelegate::CreateUObject(this, &AABCharacter::OnAssetLoadCompleted)); // 캐스팅된 클래스에서 멤버함수를 호출하여 비동기 방식으로(ReqAsycLoad) 애셋을 로딩하도록 한다.
+		}																									// CreateUObject()를 사용해 즉석에서 델리게이트를 생성하여 넘겨준다.
+	} // 데이터는 ABCharacterSetting에서, 명령어(비동기 애셋 로딩)은 GameInstance에서 사용한다!
 }
 
 void AABCharacter::Tick(float DeltaTime)
@@ -366,6 +383,16 @@ void AABCharacter::AttackCheck() // 데미지 체크
 			FDamageEvent DamageEvent;
 			HitResult.Actor->TakeDamage(CharacterStat->GetAttack(), DamageEvent, GetController(), this);
 		}
+	}
+}
+
+void AABCharacter::OnAssetLoadCompleted()
+{
+	AssetStreamingHandle->ReleaseHandle();
+	TSoftObjectPtr<USkeletalMesh> LoadAssetPath(CharacterAssetToLoad); // 애셋의 경로 정보에 해당되는 스태틱 메시 입히기
+	if (LoadAssetPath.IsValid())
+	{
+		GetMesh()->SetSkeletalMesh(LoadAssetPath.Get());
 	}
 }
 
