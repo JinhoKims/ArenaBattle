@@ -36,7 +36,7 @@ private:
 	UBoxComponent* Trigger;
 
 	UPROPERTY(EditAnywhere, Category = State, Meta = (AllowPrivateAccess = true))
-	bool bNoBattle;
+	bool bNoBattle; // 초기 설정(COMPLETE에서 시작하기 위해)을 위한 플래그 비트 값
 
 	enum class ESectionState : uint8
 	{

@@ -10,6 +10,7 @@
 #include "ABAIController.h"
 #include "ABCharacterSetting.h" // 데이터
 #include "ABGameInstance.h" // 명령어
+#include "ABPlayerController.h" 
 
 // 초기화 및 프레임별 설정
 AABCharacter::AABCharacter()
@@ -65,8 +66,13 @@ AABCharacter::AABCharacter()
 
 	AIControllerClass = AABAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-
-	
+	// PREINIT 스테이트
+	// 캐릭터는 최초로 PREINIT(생성자)에서 시작한다. 그러다가 게임이 시작돼 BeginPlay()가 호출되면, LOADING 스테이트로 넘어간다.
+	AssetIndex = 4; // 현 스테이트에서 플레이어가 강제로 캐릭터를 조종할 경우, 임시로 4번 인덱스의 캐릭터 애셋(메시)을 사용한다.
+	SetActorHiddenInGame(true); // 액터
+	HPBarWidget->SetHiddenInGame(true); // UI
+	SetCanBeDamaged(false); // 데미지 판정
+	// 캐릭터 생성 전의 스테이트 : 캐릭터와 UI를 숨겨두고, 데미지를 입지 않게 한다.
 }
 
 void AABCharacter::PostInitializeComponents() // 델리게이트 초기화 설정
@@ -110,8 +116,35 @@ void AABCharacter::PostInitializeComponents() // 델리게이트 초기화 설정
 void AABCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	// PREINIT 스테이트
+	bIsPlayer = IsPlayerControlled(); // 캐릭터를 플레이어가 컨트롤 할 경우
+	if (bIsPlayer)
+	{
+		ABPlayerController = Cast<AABPlayerController>(GetController()); // 플레이어 컨트롤러는 해당 캐릭터를 제어함
+		ABCHECK(nullptr != ABPlayerController);
+	}
+	else
+	{ // 아닐 경우
+		ABAIController = Cast<AABAIController>(GetController()); // AI컨트롤러가 해당 캐릭터를 제어함
+		ABCHECK(nullptr != ABAIController);
+	}
+	
+	auto DefaultSetting = GetDefault<UABCharacterSetting>(); // 캐릭터 세팅(로드 부분)  ini파일을 불러옴
+	if (bIsPlayer)
+	{
+		AssetIndex = 4; // 4번 인덱스의 캐릭터 에셋(플레이어용 박스 워리어)
+	}
+	else
+	{
+		AssetIndex = FMath::RandRange(0, DefaultSetting->CharacterAssets.Num() - 1); // 랜덤으로 하나의 에셋을 골라 적용
+	} // 에셋 로딩
+	CharacterAssetToLoad = DefaultSetting->CharacterAssets[AssetIndex]; // 캐릭터 에셋 로드(랜덤 또는 4번 에셋)
+	auto ABGameInstance = Cast<UABGameInstance>(GetGameInstance()); // StreamableManager를 사용하기 위해 GameInstance 클래스 파일을 객체화(캐스팅)
+	ABCHECK(nullptr != ABGameInstance);  // 비동기 방식으로 애셋을 로딩할 때 델리게이트(OnAssetLoadCompleted)를 호출하도록 등록, 캐스팅된 클래스에서 멤버함수를 호출하여 비동기 방식으로(ReqAsycLoad) 애셋을 로딩하도록 한다.
+	AssetStreamingHandle = ABGameInstance->StreamableManager.RequestAsyncLoad(CharacterAssetToLoad, FStreamableDelegate::CreateUObject(this, &AABCharacter::OnAssetLoadCompleted));  // 데이터(에셋 경로)는 ABCharacterSetting에서, 명령어(비동기 애셋 로딩 로직)은 GameInstance에서 사용한다! 데이터와 명령어 구분함
+	SetCharacterState(ECharacterState::LOADING); // LOADING 스테이트로 전이
 
-	if (!IsPlayerControlled()) // 플레이어가 아닐 경우
+/*	if (!IsPlayerControlled()) // 플레이어가 아닐 경우 (구 모듈)
 	{
 		auto DefaultSetting = GetDefault<UABCharacterSetting>(); // ini파일을 불러옴
 		int32 RandIndex = FMath::RandRange(0, DefaultSetting->CharacterAssets.Num() - 1); // 파일 길이 만큼의 범위로 랜덤 난수 지정
@@ -122,7 +155,7 @@ void AABCharacter::BeginPlay()
 		{ // 비동기 방식으로 애셋을 로딩할 때 델리게이트(OnAssetLoadCompleted)를 호출하도록 등록
 			AssetStreamingHandle = ABGameInstance->StreamableManager.RequestAsyncLoad(CharacterAssetToLoad, FStreamableDelegate::CreateUObject(this, &AABCharacter::OnAssetLoadCompleted)); // 캐스팅된 클래스에서 멤버함수를 호출하여 비동기 방식으로(ReqAsycLoad) 애셋을 로딩하도록 한다.
 		}																									// CreateUObject()를 사용해 즉석에서 델리게이트를 생성하여 넘겨준다.
-	} // 데이터는 ABCharacterSetting에서, 명령어(비동기 애셋 로딩)은 GameInstance에서 사용한다!
+	} // 데이터는 ABCharacterSetting에서, 명령어(비동기 애셋 로딩)은 GameInstance에서 사용한다! */
 }
 
 void AABCharacter::Tick(float DeltaTime)
@@ -344,6 +377,43 @@ void AABCharacter::Attack() // 공격
 	}
 }
 
+void AABCharacter::SetCharacterState(ECharacterState NewState)
+{
+	ABCHECK(CurrentState != NewState);
+	CurrentState = NewState;
+
+	switch (CurrentState)
+	{
+	case ECharacterState::LOADING: // LOADING 스테이트 설정 
+		SetActorHiddenInGame(true);
+		HPBarWidget->SetHiddenInGame(true);
+		SetCanBeDamaged(false);
+		break;
+	case ECharacterState::READY: // READY 스테이트 = 액터표시, UI, 데미지처리 표시
+		SetActorHiddenInGame(false);
+		HPBarWidget->SetHiddenInGame(false);
+		SetCanBeDamaged(true);
+		CharacterStat->OnHPIsZero.AddLambda([this]()->void {
+			SetCharacterState(ECharacterState::DEAD); // HP가 Zero면 DEAD 스테이트로 상태 전이되게 델리게이트에 등록
+		});
+		break;
+	case ECharacterState::DEAD:
+		SetActorEnableCollision(false); // 물리 비중 제거
+		GetMesh()->SetHiddenInGame(false);
+		HPBarWidget->SetHiddenInGame(true);
+		ABAnim->SetDeadAnim(); // 죽음 표시
+		SetCanBeDamaged(false);
+		break;
+	default:
+		break;
+	}
+}
+
+ECharacterState AABCharacter::GetCharacterState() const
+{
+	return ECharacterState();
+}
+
 void AABCharacter::AttackCheck() // 데미지 체크
 {
 	FHitResult HitResult;
@@ -390,10 +460,10 @@ void AABCharacter::OnAssetLoadCompleted()
 {
 	AssetStreamingHandle->ReleaseHandle();
 	TSoftObjectPtr<USkeletalMesh> LoadAssetPath(CharacterAssetToLoad); // 애셋의 경로 정보에 해당되는 스태틱 메시 입히기
-	if (LoadAssetPath.IsValid())
-	{
-		GetMesh()->SetSkeletalMesh(LoadAssetPath.Get());
-	}
+	ABCHECK(LoadAssetPath.IsValid());
+	GetMesh()->SetSkeletalMesh(LoadAssetPath.Get());
+	SetCharacterState(ECharacterState::READY); // 로드가 끝나면 READY로 전이
+	
 }
 
 void AABCharacter::AttackStartComboState() // 콤보
