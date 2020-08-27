@@ -64,11 +64,12 @@ AABCharacter::AABCharacter()
 		HPBarWidget->SetDrawSize(FVector2D(150.0f, 50.0f));
 	}
 
+	DeadTimer = 5.0f;
 	AIControllerClass = AABAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	// PREINIT 스테이트
 	// 캐릭터는 최초로 PREINIT(생성자)에서 시작한다. 그러다가 게임이 시작돼 BeginPlay()가 호출되면, LOADING 스테이트로 넘어간다.
-	AssetIndex = 4; // 현 스테이트에서 플레이어가 강제로 캐릭터를 조종할 경우, 임시로 4번 인덱스의 캐릭터 애셋(메시)을 사용한다.
+	AssetIndex = 4;
 	SetActorHiddenInGame(true); // 액터
 	HPBarWidget->SetHiddenInGame(true); // UI
 	SetCanBeDamaged(false); // 데미지 판정
@@ -385,24 +386,70 @@ void AABCharacter::SetCharacterState(ECharacterState NewState)
 	switch (CurrentState)
 	{
 	case ECharacterState::LOADING: // LOADING 스테이트 설정 
+	{
+		if (bIsPlayer)
+		{
+			DisableInput(ABPlayerController); // 로딩 중 입력 비활성화
+		}
 		SetActorHiddenInGame(true);
 		HPBarWidget->SetHiddenInGame(true);
 		SetCanBeDamaged(false);
-		break;
+	}
+	break;
 	case ECharacterState::READY: // READY 스테이트 = 액터표시, UI, 데미지처리 표시
+	{
 		SetActorHiddenInGame(false);
 		HPBarWidget->SetHiddenInGame(false);
 		SetCanBeDamaged(true);
 		CharacterStat->OnHPIsZero.AddLambda([this]()->void {
 			SetCharacterState(ECharacterState::DEAD); // HP가 Zero면 DEAD 스테이트로 상태 전이되게 델리게이트에 등록
 		});
-		break;
+		HPBarWidget->InitWidget();
+		auto CharacterWidget = Cast<UABCharacterWidget>(HPBarWidget->GetUserWidgetObject());
+		ABCHECK(nullptr != CharacterWidget);
+		CharacterWidget->BindCharacterStat(CharacterStat);
+
+		if (bIsPlayer) // 플레이어일 경우 카메라, 이동속도 할당
+		{
+			SetControlMode(EControlMode::DIABLO);
+			GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+			EnableInput(ABPlayerController);
+		}
+		else
+		{
+			SetControlMode(EControlMode::NPC);
+			GetCharacterMovement()->MaxWalkSpeed = 400.0f;
+			ABAIController->RunAI(); // NPC일 경우 AI 트리를 실행시킨다.
+		}
+	}
+	break;
 	case ECharacterState::DEAD:
+	{
 		SetActorEnableCollision(false); // 물리 비중 제거
 		GetMesh()->SetHiddenInGame(false);
 		HPBarWidget->SetHiddenInGame(true);
 		ABAnim->SetDeadAnim(); // 죽음 표시
 		SetCanBeDamaged(false);
+
+		if (bIsPlayer)
+		{
+			DisableInput(ABPlayerController);
+		}
+		else
+		{
+			ABAIController->StopAI(); // NPC일 경우 해동 트리를 중단시킨다.
+		}
+		GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda([this]()->void { // 캐릭터가 죽을 경우 일정 타이머(5.0f) 후에 람다로 등록된 델리게이트 호출 SetTimer()
+			if (bIsPlayer)
+			{
+				ABPlayerController->RestartLevel(); // 플레이어는 리스폰
+			}
+			else
+			{
+				Destroy(); // NPC는 삭제
+			}
+		}), DeadTimer, false); // DeadTimer가 일정시간이며, 5.0f로 설정되었다.
+	}
 		break;
 	default:
 		break;
