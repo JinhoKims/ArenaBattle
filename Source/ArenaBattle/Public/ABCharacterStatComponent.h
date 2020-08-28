@@ -38,6 +38,7 @@ public:
 	void SetHP(float NewHP);
 	float GetAttack();
 	float GetHPRatio();
+	int32 GetDropExp() const;
 
 protected:
 	virtual void BeginPlay() override;

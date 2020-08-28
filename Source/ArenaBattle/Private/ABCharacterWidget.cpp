@@ -13,7 +13,7 @@ void UABCharacterWidget::BindCharacterStat(UABCharacterStatComponent* NewCharact
 
 	NewCharacterStat->OnHPChanged.AddLambda([this]()->void { // hp가 변경될 때마다 람다식 호출
 		if (CurrentCharacterStat.IsValid()) {
-			ABLOG_Long(Error, TEXT("HPRatio : %f"), CurrentCharacterStat->GetHPRatio());
+			ABLOG_Long(Warning, TEXT("HPRatio : %f"), CurrentCharacterStat->GetHPRatio());
 		}
 	});
 

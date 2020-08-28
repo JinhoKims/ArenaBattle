@@ -11,6 +11,8 @@
 #include "ABCharacterSetting.h" // 데이터
 #include "ABGameInstance.h" // 명령어
 #include "ABPlayerController.h" 
+#include "ABPlayerState.h"
+#include "ABHUDWidget.h"
 
 // 초기화 및 프레임별 설정
 AABCharacter::AABCharacter()
@@ -144,19 +146,6 @@ void AABCharacter::BeginPlay()
 	ABCHECK(nullptr != ABGameInstance);  // 비동기 방식으로 애셋을 로딩할 때 델리게이트(OnAssetLoadCompleted)를 호출하도록 등록, 캐스팅된 클래스에서 멤버함수를 호출하여 비동기 방식으로(ReqAsycLoad) 애셋을 로딩하도록 한다.
 	AssetStreamingHandle = ABGameInstance->StreamableManager.RequestAsyncLoad(CharacterAssetToLoad, FStreamableDelegate::CreateUObject(this, &AABCharacter::OnAssetLoadCompleted));  // 데이터(에셋 경로)는 ABCharacterSetting에서, 명령어(비동기 애셋 로딩 로직)은 GameInstance에서 사용한다! 데이터와 명령어 구분함
 	SetCharacterState(ECharacterState::LOADING); // LOADING 스테이트로 전이
-
-/*	if (!IsPlayerControlled()) // 플레이어가 아닐 경우 (구 모듈)
-	{
-		auto DefaultSetting = GetDefault<UABCharacterSetting>(); // ini파일을 불러옴
-		int32 RandIndex = FMath::RandRange(0, DefaultSetting->CharacterAssets.Num() - 1); // 파일 길이 만큼의 범위로 랜덤 난수 지정
-		CharacterAssetToLoad = DefaultSetting->CharacterAssets[RandIndex]; // 랜덤 인덱스를 사용하여 무작위 캐릭터 애셋 로드
-
-		auto ABGameInstance = Cast<UABGameInstance>(GetGameInstance()); // StreamableManager를 사용하기 위해 GameInstance 클래스 파일을 객체화(캐스팅)
-		if (nullptr != ABGameInstance)
-		{ // 비동기 방식으로 애셋을 로딩할 때 델리게이트(OnAssetLoadCompleted)를 호출하도록 등록
-			AssetStreamingHandle = ABGameInstance->StreamableManager.RequestAsyncLoad(CharacterAssetToLoad, FStreamableDelegate::CreateUObject(this, &AABCharacter::OnAssetLoadCompleted)); // 캐스팅된 클래스에서 멤버함수를 호출하여 비동기 방식으로(ReqAsycLoad) 애셋을 로딩하도록 한다.
-		}																									// CreateUObject()를 사용해 즉석에서 델리게이트를 생성하여 넘겨준다.
-	} // 데이터는 ABCharacterSetting에서, 명령어(비동기 애셋 로딩)은 GameInstance에서 사용한다! */
 }
 
 void AABCharacter::Tick(float DeltaTime)
@@ -390,6 +379,10 @@ void AABCharacter::SetCharacterState(ECharacterState NewState)
 		if (bIsPlayer)
 		{
 			DisableInput(ABPlayerController); // 로딩 중 입력 비활성화
+			ABPlayerController->GetHUDWidget()->BindCharacterStat(CharacterStat); // HUD 위젯과 캐릭터 스탯을연결
+			auto ABPlayerState = Cast<AABPlayerState>(GetPlayerState()); // 플레이어 스탯 캐스팅
+			ABCHECK(nullptr != ABPlayerState);
+			CharacterStat->SetNewLevel(ABPlayerState->GetCharacterLevel()); // 플레이어 레벨 세팅 (5레벨)
 		}
 		SetActorHiddenInGame(true);
 		HPBarWidget->SetHiddenInGame(true);
@@ -459,6 +452,11 @@ void AABCharacter::SetCharacterState(ECharacterState NewState)
 ECharacterState AABCharacter::GetCharacterState() const
 {
 	return ECharacterState();
+}
+
+int32 AABCharacter::GetExp() const
+{
+	return CharacterStat->GetDropExp();
 }
 
 void AABCharacter::AttackCheck() // 데미지 체크
@@ -537,11 +535,20 @@ void AABCharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted
 	OnAttackEnd.Broadcast();
 }
 
-float AABCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) // 데미지 계산
-{
+float AABCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) // 캐릭터가 받은 데미지 계산
+{																						   // ※ Instigator = 가해자 (때린 캐릭터)
 	float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	ABLOG_Long(Warning, TEXT("Actor : %s took Damage : %f"), *GetName(), FinalDamage);
 
-	CharacterStat->SetDamage(FinalDamage); // 최종 데미지 전달
+	CharacterStat->SetDamage(FinalDamage);
+	if (CurrentState == ECharacterState::DEAD)
+	{
+		if (EventInstigator->IsPlayerController()) // 때리는 자가 플레이어일 경우
+		{ 
+			auto ABPlayerControllerIsPlayer = Cast<AABPlayerController>(EventInstigator);
+			ABCHECK(nullptr != ABPlayerControllerIsPlayer, 0.0f);
+			ABPlayerControllerIsPlayer->NPCKill(this);
+		}
+	}
 	return FinalDamage;
 }

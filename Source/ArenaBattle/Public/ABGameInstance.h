@@ -26,7 +26,7 @@ public:
 	float Attack;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
-	int32 DropExp;
+	int32 DropExp; // 몬스터가 드롭할 exp
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
 	int32 NextExp;
