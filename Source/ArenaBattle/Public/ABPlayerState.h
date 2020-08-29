@@ -25,6 +25,9 @@ public:
 	void InitPlayerData();
 	bool AddExp(int32 IncomeExp);
 	void AddGameScore();
+	int32 GetGameHighScore() const;
+	FString SaveSlotName; // 세이브 슬롯은 1개만 생성
+	void SavePlayerData();
 
 protected:
 	UPROPERTY(Transient)
@@ -35,6 +38,9 @@ protected:
 
 	UPROPERTY(Transient)
 	int32 Exp;
+
+	UPROPERTY(Transient)
+	int32 GameHighScore; // 역대 최고 스코어(우측값)
 
 private:
 	void SetCharacterLevel(int32 NewCharacterLevel);
