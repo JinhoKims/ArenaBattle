@@ -48,7 +48,7 @@ void UABAnimInstance::JumpToAttackMontageSection(int32 NewSection)
 
 void UABAnimInstance::AnimNotify_AttackHitCheck() // 에니메이션에서 (AttackHitCheck)노티파이가 발생하면 실행되는 함수
 { // 애니메이션 중 노티파이가 발생할 경우 현 함수가 호출되며, 함수 안에서 델리게이트를 호출한다.
-	ABLOG_Long(Error, TEXT("Start Deleagate"));
+	// ABLOG_Long(Error, TEXT("Start Deleagate")); 확인용 로그
 	OnAttackHitCheck.Broadcast(); // 델리게이트에 등록한 함수 실행 : ABCharacter.cpp의 ABAnim->OnAttackHitCheck.AddUObject(this, &AABCharacter::AttackCheck);
 }
 

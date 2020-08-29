@@ -7,7 +7,7 @@
 #include "BTDecorator_IsInAttackRange.generated.h"
 
 /**
- * 
+ *  행동 트리의 데코레이터 클래스
  */
 UCLASS()
 class ARENABATTLE_API UBTDecorator_IsInAttackRange : public UBTDecorator

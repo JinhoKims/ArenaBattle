@@ -8,11 +8,12 @@
 #include "Components/WidgetComponent.h"
 #include "ABCharacterWidget.h"
 #include "ABAIController.h"
-#include "ABCharacterSetting.h" // 데이터
-#include "ABGameInstance.h" // 명령어
+#include "ABCharacterSetting.h" // 스탯 데이터
+#include "ABGameInstance.h" // 스탯 명령어
 #include "ABPlayerController.h" 
 #include "ABPlayerState.h"
 #include "ABHUDWidget.h"
+#include "ABGameMode.h"
 
 // 초기화 및 프레임별 설정
 AABCharacter::AABCharacter()
@@ -53,7 +54,7 @@ AABCharacter::AABCharacter()
 	MaxCombo = 4;
 	AttackEndComboState();
 	GetCapsuleComponent()->SetCollisionProfileName(TEXT("ABCharacter"));
-	AttackRange = 200.0f;
+	AttackRange = 80.0f; // 맨손 사거리
 	AttackRadius = 50.0f;
 
 	HPBarWidget->SetRelativeLocation(FVector(0.0f, 0.0f, 180.0f));
@@ -66,7 +67,7 @@ AABCharacter::AABCharacter()
 		HPBarWidget->SetDrawSize(FVector2D(150.0f, 50.0f));
 	}
 
-	DeadTimer = 5.0f;
+	DeadTimer = 1.0f;
 	AIControllerClass = AABAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	// PREINIT 스테이트
@@ -87,7 +88,6 @@ void AABCharacter::PostInitializeComponents() // 델리게이트 초기화 설정
 
 	ABAnim->OnNextAttackCheck.AddLambda([this]() -> void { // OnNextAttck 델리게이트에 등록한 함수, 연속 공격시 델리게이트가 호출함
 
-		ABLOG_Long(Warning, TEXT("OnNextAttackCheck"));
 		CanNextCombo = false;
 
 		if (IsComboInputOn)
@@ -103,23 +103,23 @@ void AABCharacter::PostInitializeComponents() // 델리게이트 초기화 설정
 		SetActorEnableCollision(false); // 콜리전(물리) 비활성화
 	}); // 델리게이트가 호출할 람다식
 
-	HPBarWidget->InitWidget(); // ※ 4.25 버전 추가사항 : 사용자 위젯이 초기화되었는지 확인 필요!! UI 초기화는 BeginPlay()에서 호출되므로 미리 확인 필요
-	auto CharacterWidget = Cast<UABCharacterWidget>(HPBarWidget->GetUserWidgetObject());
-
-	if (nullptr != CharacterWidget)
-	{
-		CharacterWidget->BindCharacterStat(CharacterStat);
-	}
-	else
-	{
-		ABLOG_Short(Error);
-	}
+//	HPBarWidget->InitWidget(); ※ 4.25 버전 추가 사항 : 사용자 위젯이 초기화되었는 지 확인 필요!! UI 초기화는 BeginPlay()에서 호출되므로 미리 확인 필요, But HPBar 클래스의 멤버 함수에 등록된 브로드캐스트가 두 번 호출된다!
 }
 
 void AABCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	// PREINIT 스테이트
+	auto CharacterWidget = Cast<UABCharacterWidget>(HPBarWidget->GetUserWidgetObject());
+	if (nullptr != CharacterWidget)
+	{
+		CharacterWidget->BindCharacterStat(CharacterStat); // ABCharacterWidget.cpp의 ABLOG_Long(Warning, TEXT("HPRatio : %f"), CurrentCharacterStat->GetHPRatio()); 로그를 쓰고싶을 때 주석하기!
+	}
+	else
+	{
+		ABLOG_Short(Error);
+	}
+
 	bIsPlayer = IsPlayerControlled(); // 캐릭터를 플레이어가 컨트롤 할 경우
 	if (bIsPlayer)
 	{
@@ -316,7 +316,7 @@ void AABCharacter::ViewChange() // 카메라 모드 토글
 // 전투 시스템 
 bool AABCharacter::CanSetWeapon()
 {
-	return (nullptr == CurrentWeapon);
+	return true;
 }
 
 void AABCharacter::PossessedBy(AController* NewController) // 캐릭터의 빙의자가 누구인가(플레이어,npc), 기본 카메라 타입과 이동속도를 설정 
@@ -334,10 +334,17 @@ void AABCharacter::PossessedBy(AController* NewController) // 캐릭터의 빙의자가 
 	}
 }
 
-void AABCharacter::SetWeapon(AABWeapon* NewWeapon) // 무기 장착
+void AABCharacter::SetWeapon(AABWeapon* NewWeapon) // 무기 장착 시
 {
-	ABCHECK(nullptr != NewWeapon && nullptr == CurrentWeapon);
-	FName WeaponSocket(TEXT("hand_rSocket"));
+	ABCHECK(nullptr != NewWeapon);
+	if (nullptr != CurrentWeapon) // 이미 무기를 장착하고 있을경우
+	{
+		CurrentWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform); // 무기 분리
+		CurrentWeapon->Destroy(); // 무기 파괴
+		CurrentWeapon = nullptr; // null 할당
+	}
+
+	FName WeaponSocket(TEXT("hand_rSocket")); // 새로 무기 장착
 	if (nullptr != NewWeapon)
 	{
 		NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
@@ -348,7 +355,6 @@ void AABCharacter::SetWeapon(AABWeapon* NewWeapon) // 무기 장착
 
 void AABCharacter::Attack() // 공격
 {
-	ABLOG_Short(Warning);
 	if (IsAttacking) // 이미 공격 중일시 콤보 지속
 	{
 		ABCHECK(FMath::IsWithinInclusive<int32>(CurrentCombo, 1, MaxCombo));
@@ -384,6 +390,16 @@ void AABCharacter::SetCharacterState(ECharacterState NewState)
 			ABCHECK(nullptr != ABPlayerState);
 			CharacterStat->SetNewLevel(ABPlayerState->GetCharacterLevel()); // 플레이어 레벨 세팅 (5레벨)
 		}
+		else
+		{
+			auto ABGameMode = Cast<AABGameMode>(GetWorld()->GetAuthGameMode()); // 게임 실행 중에 게임 모드의 포인터를 가져올 때는 GetAuthGameMode() 함수를 사용한다. (중요한 데이터를 인증하는 권한을 가진다)
+			ABCHECK(nullptr != ABGameMode);
+			int32 TargetLevel = FMath::CeilToInt(((float)ABGameMode->GetScore() * 0.8f)); // 불러올 레벨 설정
+			int32 FinalLevel = FMath::Clamp<int32>(TargetLevel, 1, 20); // 최대 레벨 제한설정
+			ABLOG_Long(Warning, TEXT("Now New NPC Level Available is %d"), FinalLevel);
+			CharacterStat->SetNewLevel(FinalLevel); // NPC 레벨 세팅
+		}
+
 		SetActorHiddenInGame(true);
 		HPBarWidget->SetHiddenInGame(true);
 		SetCanBeDamaged(false);
@@ -432,10 +448,10 @@ void AABCharacter::SetCharacterState(ECharacterState NewState)
 		{
 			ABAIController->StopAI(); // NPC일 경우 해동 트리를 중단시킨다.
 		}
-		GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda([this]()->void { // 캐릭터가 죽을 경우 일정 타이머(5.0f) 후에 람다로 등록된 델리게이트 호출 SetTimer()
+		GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda([this]()->void { // 캐릭터가 죽을 경우 일정 타이머(1.0f) 후에 람다로 등록된 델리게이트 호출 SetTimer()
 			if (bIsPlayer)
 			{
-				ABPlayerController->RestartLevel(); // 플레이어는 리스폰
+				ABPlayerController->RestartLevel(); // 플레이어는 리스폰, 플레이어 점수 초기화
 			}
 			else
 			{
@@ -459,23 +475,37 @@ int32 AABCharacter::GetExp() const
 	return CharacterStat->GetDropExp();
 }
 
+float AABCharacter::GetFinalAttackRange() const
+{
+	return (nullptr != CurrentWeapon) ? CurrentWeapon->GetAttackRange() : AttackRange; // 무기를 들고 있으면 무기 사거리로 반환
+}
+
+float AABCharacter::GetFinalAttackDamage() const
+{
+	float AttackDamage = (nullptr != CurrentWeapon) ? (CharacterStat->GetAttack() + CurrentWeapon->GetAttackDamage()) : CharacterStat->GetAttack();
+	float AttackModifier = (nullptr != CurrentWeapon) ? CurrentWeapon->GetAttackModifier() : 1.0f; // 맨손이면 가중치 1.0 고정
+
+	return AttackDamage * AttackModifier;
+}
+
 void AABCharacter::AttackCheck() // 데미지 체크
 {
+	float FinalAttackRange = GetFinalAttackRange(); // 무기 사거리
 	FHitResult HitResult;
 	FCollisionQueryParams Params(NAME_None, false, this); // Parm 설정 
 	bool bResult = GetWorld()->SweepSingleByChannel(
 		HitResult,
 		GetActorLocation(),
-		GetActorLocation() + GetActorForwardVector() * 200.0f,
+		GetActorLocation() + GetActorForwardVector() * FinalAttackRange, // 공격 사거리 설정
 		FQuat::Identity,
 		ECollisionChannel::ECC_GameTraceChannel2,
 		FCollisionShape::MakeSphere(50.0f),
 		Params);
 
 #if ENABLE_DRAW_DEBUG
-	FVector TraceVec = GetActorForwardVector() * AttackRange;
+	FVector TraceVec = GetActorForwardVector() * FinalAttackRange;
 	FVector Center = GetActorLocation() + TraceVec * 0.5f;
-	float HalfHeight = AttackRange * 0.5f + AttackRadius;
+	float HalfHeight = FinalAttackRange * 0.5f + AttackRadius;
 	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(TraceVec).ToQuat();
 	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
 	float DebugLifeTime = 5.0f;
@@ -496,7 +526,7 @@ void AABCharacter::AttackCheck() // 데미지 체크
 		{
 			ABLOG_Long(Warning, TEXT("Hit Actor Name %s"), *HitResult.Actor->GetName());
 			FDamageEvent DamageEvent;
-			HitResult.Actor->TakeDamage(CharacterStat->GetAttack(), DamageEvent, GetController(), this);
+			HitResult.Actor->TakeDamage(GetFinalAttackDamage(), DamageEvent, GetController(), this);
 		}
 	}
 }
@@ -538,7 +568,8 @@ void AABCharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted
 float AABCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) // 캐릭터가 받은 데미지 계산
 {																						   // ※ Instigator = 가해자 (때린 캐릭터)
 	float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	ABLOG_Long(Warning, TEXT("Actor : %s took Damage : %f"), *GetName(), FinalDamage);
+	if (EventInstigator->IsPlayerController())
+		ABLOG_Long(Warning, TEXT("Actor : %s took Damage : %f"), *GetName(), FinalDamage);
 
 	CharacterStat->SetDamage(FinalDamage);
 	if (CurrentState == ECharacterState::DEAD)

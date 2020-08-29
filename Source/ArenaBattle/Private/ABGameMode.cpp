@@ -8,7 +8,6 @@
 #include "ABGameState.h"
 
 AABGameMode::AABGameMode() {
-	ABLOG_Long(Error, TEXT("AABGameMode Costructor"));
 	DefaultPawnClass = AABCharacter::StaticClass();
 	PlayerControllerClass = AABPlayerController::StaticClass();
 	PlayerStateClass = AABPlayerState::StaticClass(); // PlayerState 클래스를 AB플레이어 스테이트로 동적할당하여 스텟정보를 가져올 수 있다.
@@ -40,6 +39,11 @@ void AABGameMode::AddScore(AABPlayerController* ScoredPlayer) // (플레이어 점수)
 			ABPlayerController->AddGameScore(); // 해당 컨트롤러에게 점수 추가
 			break; // 반복문 종료
 		}
-		ABGameState->AddGameScore(); // 통합 점수도 획득
 	}
+	ABGameState->AddGameScore(); // 통합 점수도 획득
+}
+
+int32 AABGameMode::GetScore() const
+{
+	return ABGameState->GetTotalGameScore();
 }

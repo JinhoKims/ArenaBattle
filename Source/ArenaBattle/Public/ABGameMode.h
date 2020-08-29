@@ -19,6 +19,7 @@ public:
 	virtual void PostInitializeComponents() override;
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	void AddScore(class AABPlayerController* ScoredPlayer); // 플레이어 개인 점수 획득 (GameState가 통합점수)
+	int32 GetScore() const;
 
 private:
 	UPROPERTY()
