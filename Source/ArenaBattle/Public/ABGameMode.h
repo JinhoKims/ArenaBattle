@@ -13,8 +13,14 @@ UCLASS()
 class ARENABATTLE_API AABGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-	AABGameMode();
-
+	
 public:
+	AABGameMode();
+	virtual void PostInitializeComponents() override;
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+	void AddScore(class AABPlayerController* ScoredPlayer); // 플레이어 개인 점수 획득 (GameState가 통합점수)
+
+private:
+	UPROPERTY()
+	class AABGameState* ABGameState;
 };

@@ -18,13 +18,13 @@ class ARENABATTLE_API AABPlayerState : public APlayerState
 	
 public:
 	AABPlayerState(); // 플레이어 점수와 경험지 등을 저장
-	FOnPlayerStateChangeDelegate OnPlayerStateChanged;
+	FOnPlayerStateChangeDelegate OnPlayerStateChanged; // 스탯 동기화를 위한 델리게이트
 	int32 GetGameScore() const;
 	int32 GetCharacterLevel() const;
 	float GetExpratio() const;
 	void InitPlayerData();
 	bool AddExp(int32 IncomeExp);
-	
+	void AddGameScore();
 
 protected:
 	UPROPERTY(Transient)

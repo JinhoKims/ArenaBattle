@@ -59,6 +59,12 @@ bool AABPlayerState::AddExp(int32 IncomeExp)
     return DidLevelUp;
 }
 
+void AABPlayerState::AddGameScore()
+{
+    GameScore++; // 개인 점수 획득
+    OnPlayerStateChanged.Broadcast(); // 플레이어 UI에 동기화 
+}
+
 
 void AABPlayerState::SetCharacterLevel(int32 NewCharacterLevel)
 {

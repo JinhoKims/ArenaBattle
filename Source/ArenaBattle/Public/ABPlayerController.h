@@ -20,6 +20,7 @@ public:
 	virtual void OnPossess(APawn * aPawn) override; // 빙의(Possess)를 진행하는 시점
 	class UABHUDWidget* GetHUDWidget() const;
 	void NPCKill(class AABCharacter* KilledNPC) const;
+	void AddGameScore() const;
 
 protected:
 	virtual void BeginPlay() override;

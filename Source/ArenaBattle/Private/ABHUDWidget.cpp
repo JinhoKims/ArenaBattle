@@ -27,7 +27,7 @@ void UABHUDWidget::NativeConstruct()
 {
 	Super::NativeConstruct(); // 블프의 변수(위젯)과 클래스의 변수를 연동
 	HPBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("pbHP"))); // HPBar(변수) 연동 bpHP(블프)
-	ExpBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("pbExp")));
+	ExpBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("pbExp"))); // pb = Progress Bar
 	PlayerName = Cast<UTextBlock>(GetWidgetFromName(TEXT("txtPlayerName")));
 	PlayerLevel = Cast<UTextBlock>(GetWidgetFromName(TEXT("txtLevel")));
 	CurrentScore = Cast<UTextBlock>(GetWidgetFromName(TEXT("txtCurrentScore"))); // 현재 점수 UI
@@ -42,7 +42,7 @@ void UABHUDWidget::UpdateCharacterStat() // 델리게이트에 등록할 함수
 
 void UABHUDWidget::UpdatePlayerState() // 델리게이트에 등록할 함수
 {
-	ABCHECK(CurrentPlayerState.IsValid());
+	ABCHECK(CurrentPlayerState.IsValid()); // UI의 플레이어 경험치, 점수, 이름을 갱신
 	ExpBar->SetPercent(CurrentPlayerState->GetExpratio());
 	PlayerName->SetText(FText::FromString(CurrentPlayerState->GetPlayerName()));
 	PlayerLevel->SetText(FText::FromString(FString::FromInt(CurrentPlayerState->GetCharacterLevel()))); // 정확하지 않게 건드리면 에러나니, UI랑 꼭 일치시켜야함!

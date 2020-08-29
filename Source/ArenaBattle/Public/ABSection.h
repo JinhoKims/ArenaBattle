@@ -38,7 +38,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = State, Meta = (AllowPrivateAccess = true))
 	bool bNoBattle; // 초기 설정(COMPLETE에서 시작하기 위해)을 위한 플래그 비트 값
 
-	enum class ESectionState : uint8
+	enum class ESectionState : uint8 // 섹션 상태
 	{
 		READY=0,
 		BATTLE,
@@ -65,5 +65,8 @@ private:
 
 	FTimerHandle SpawnNPCTimerHandle = {};
 	FTimerHandle SpawnItemBoxTimerHandle = {};
+
+	UFUNCTION()
+	void OnKeyNPCDestroyed(AActor * DestroyedActor);
 
 };

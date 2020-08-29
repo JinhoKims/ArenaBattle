@@ -4,6 +4,8 @@
 #include "ABSection.h"
 #include "ABCharacter.h"
 #include "ABItemBox.h"
+#include "ABPlayerController.h"
+#include "ABGameMode.h"
 
 // Sets default values
 AABSection::AABSection()
@@ -125,9 +127,14 @@ void AABSection::OperateGates(bool bOpen) // 문여는 함수
 	}
 }
 
-void AABSection::OnNPCSpawn()
+void AABSection::OnNPCSpawn() // 섹터 NPC 생성
 {
-	GetWorld()->SpawnActor<AABCharacter>(GetActorLocation() + FVector::UpVector * 88.0f, FRotator::ZeroRotator); // 스폰될 액터(NPC) 좌표 설정 및 생성
+	GetWorld()->GetTimerManager().ClearTimer(SpawnNPCTimerHandle); // 타이머 초기화
+	auto KeyNPC = GetWorld()->SpawnActor<AABCharacter>(GetActorLocation() + FVector::UpVector * 88.0f, FRotator::ZeroRotator); // 스폰될 액터(NPC) 좌표 설정 및 생성
+	if (nullptr != KeyNPC)
+	{
+		KeyNPC->OnDestroyed.AddDynamic(this, &AABSection::OnKeyNPCDestroyed); // NPC가 죽을 시 델리게이트에 함수 등록
+	}
 }
 
 void AABSection::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -166,6 +173,21 @@ void AABSection::OnGateTriggerBeginOverlap(UPrimitiveComponent* OverlappedCompon
 	{
 		ABLOG_Long(Warning, TEXT("New section area is not empty.")); 
 	}
+}
+
+void AABSection::OnKeyNPCDestroyed(AActor* DestroyedActor)
+{
+	auto ABCharacter = Cast<AABCharacter>(DestroyedActor);
+	ABCHECK(nullptr != ABCharacter);
+
+	auto ABPlayerController = Cast<AABPlayerController>(ABCharacter->LastHitBy); // LastHItBy : 마지막으로 일격을 날린 컨트롤러(플레이어)
+	ABCHECK(nullptr != ABPlayerController);
+
+	auto ABGameMode = Cast<AABGameMode>(GetWorld()->GetAuthGameMode()); // ABGameMode 캐스팅
+	ABCHECK(nullptr != ABGameMode);
+	ABGameMode->AddScore(ABPlayerController); // 점수 획득은 GameMode에서 통합적으로 관리된다.
+
+	SetState(ESectionState::COMPLETE); // 섹션 상태를 COMPLETE로 전환
 }
 
 // Called every frame
