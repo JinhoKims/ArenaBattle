@@ -442,18 +442,18 @@ void AABCharacter::SetCharacterState(ECharacterState NewState)
 		ABAnim->SetDeadAnim(); // 죽음 표시
 		SetCanBeDamaged(false);
 
-		if (bIsPlayer)
+		if (bIsPlayer) // 죽은 캐릭터가 플레이어일 경우
 		{
-			DisableInput(ABPlayerController);
+			DisableInput(ABPlayerController); // 작동 권한 해제
 		}
 		else
 		{
 			ABAIController->StopAI(); // NPC일 경우 해동 트리를 중단시킨다.
-		}
-		GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda([this]()->void { // 캐릭터가 죽을 경우 일정 타이머(1.0f) 후에 람다로 등록된 델리게이트 호출 SetTimer()
-			if (bIsPlayer)
+		} 
+		GetWorld()->GetTimerManager().SetTimer(DeadTimerHandle, FTimerDelegate::CreateLambda([this]()->void { // 그리고 일정시간 후-
+			if (bIsPlayer) // 캐릭터가 죽을 경우 일정 타이머(1.0f) 후에 람다로 등록된 델리게이트 호출 SetTimer()
 			{
-				ABPlayerController->RestartLevel(); // 플레이어는 리스폰, 플레이어 점수 초기화
+				ABPlayerController->ShowResultUI(); // 결과 화면 출력
 			}
 			else
 			{

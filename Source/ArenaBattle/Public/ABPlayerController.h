@@ -21,18 +21,36 @@ public:
 	class UABHUDWidget* GetHUDWidget() const;
 	void NPCKill(class AABCharacter* KilledNPC) const;
 	void AddGameScore() const;
+	void ChangeInputMode(bool bGameMode = true);
+	void ShowResultUI(); // 게임 결과 화면
 
 protected:
 	virtual void BeginPlay() override;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)
-	TSubclassOf<class UABHUDWidget> HUDWidgetClass;
 	virtual void SetupInputComponent() override; // 단축키 바인딩
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)
+	TSubclassOf<class UABHUDWidget> HUDWidgetClass; // 에디터에서 UI에셋(리소스)과 연동할 템플릿 클래스
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)
+	TSubclassOf<class UABGamplayWidget> MenuWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)
+	TSubclassOf<class UABGameplayResultWidget> ResultWidgetClass;
+	
 private:
-	class UABHUDWidget* HUDWidget;
+	UPROPERTY()
+	class UABHUDWidget* HUDWidget; // 인스턴스화될 위젯 클래스들
 
 	UPROPERTY()
 	class AABPlayerState* ABPlayerState;
 	
+	UPROPERTY()
+	class UABGamplayWidget* MenuWidget;
+
+	UPROPERTY()
+	class UABGameplayResultWidget * ResultWidget; // 위젯 클래스 : (AddToViewport())로 화면에 출력할 수 있다.
+
+	FInputModeGameOnly GameInputMode;
+	FInputModeUIOnly UIInputMode;
 	void OnGamePause(); // 게임 중지 
 };

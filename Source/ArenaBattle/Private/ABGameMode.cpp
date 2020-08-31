@@ -12,6 +12,7 @@ AABGameMode::AABGameMode() {
 	PlayerControllerClass = AABPlayerController::StaticClass();
 	PlayerStateClass = AABPlayerState::StaticClass(); // PlayerState 클래스를 AB플레이어 스테이트로 동적할당하여 스텟정보를 가져올 수 있다.
 	GameStateClass = AABGameState::StaticClass(); // GameState 클래스를 가져온다
+	ScoreToClear = 3; // 게임 승리 조건 설정
 }
 
 void AABGameMode::PostInitializeComponents()
@@ -41,6 +42,25 @@ void AABGameMode::AddScore(AABPlayerController* ScoredPlayer) // (플레이어 점수)
 		}
 	}
 	ABGameState->AddGameScore(); // 통합 점수도 획득
+
+	if (GetScore() >= ScoreToClear) // 현재 점수가 클리어 목표보다 높을 경우
+	{
+		ABGameState->SetGameCleared(); // 클리어 활성화
+
+		for (FConstPawnIterator It = GetWorld()->GetPawnIterator(); It; It++) // 월드의 모든 폰 대상
+		{
+			(*It)->TurnOff(); // 폰의 활동을 멈춤
+		}
+
+		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; It++) // 월드의 모든 플레이어 컨트롤러 대상
+		{
+			const auto ABPlayerController = Cast<AABPlayerController>(It->Get()); // 플레이어 컨트롤러 캐스팅
+			if (nullptr != ABPlayerController)
+			{
+				ABPlayerController->ShowResultUI(); // 결과 화면 출력
+			}
+		}
+	}
 }
 
 int32 AABGameMode::GetScore() const

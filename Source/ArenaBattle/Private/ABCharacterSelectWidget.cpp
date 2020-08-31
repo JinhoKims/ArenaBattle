@@ -34,7 +34,7 @@ void UABCharacterSelectWidget::NextCharacter(bool bForward)
 
 
 
-void UABCharacterSelectWidget::NativeConstruct() // 최초 생성자
+void UABCharacterSelectWidget::NativeConstruct() // UI 위젯을 초기화하는 시점에서 발생
 {
 	Super::NativeConstruct();
 

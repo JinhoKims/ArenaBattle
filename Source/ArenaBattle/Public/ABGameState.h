@@ -18,8 +18,13 @@ public:
 	AABGameState();
 	int32 GetTotalGameScore() const;
 	void AddGameScore();
+	void SetGameCleared(); // 클리어 달성 활성화
+	bool IsGameCleared() const; // 달성여부 반환
 
 private:
 	UPROPERTY(Transient)
 	int32 TotalGameScore;
+
+	UPROPERTY(Transient)
+	bool bGameCleared; // 게임 클리어 조건 달성여부
 };
