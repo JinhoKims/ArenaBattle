@@ -59,4 +59,16 @@ void AABPlayerController::BeginPlay()
 	
 }
 
+void AABPlayerController::OnGamePause()
+{
+
+}
+
+void AABPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+	InputComponent->BindAction(TEXT("GamePause"), EInputEvent::IE_Pressed, this, &AABPlayerController::OnGamePause); // 키 바인딩 설정, 에디터에서 M키로 설정된 GamPause를 누르면 OnGamePause() 함수를 호출하도록 델리게이트에 등록했다.
+	
+}
+
 

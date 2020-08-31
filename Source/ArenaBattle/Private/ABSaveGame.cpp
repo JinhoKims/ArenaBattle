@@ -9,4 +9,5 @@ UABSaveGame::UABSaveGame()
 	Exp = 0;
 	PlayerName = TEXT("Guest");
 	HighScore = 0;
+	CharacterIndex = 0;
 } // 세이브 데이터(변수)는 ABPlayerState에서 관리한다.

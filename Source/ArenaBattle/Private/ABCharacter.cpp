@@ -113,7 +113,7 @@ void AABCharacter::BeginPlay()
 	auto CharacterWidget = Cast<UABCharacterWidget>(HPBarWidget->GetUserWidgetObject());
 	if (nullptr != CharacterWidget)
 	{
-		CharacterWidget->BindCharacterStat(CharacterStat); // ABCharacterWidget.cpp의 ABLOG_Long(Warning, TEXT("HPRatio : %f"), CurrentCharacterStat->GetHPRatio()); 로그를 쓰고싶을 때 주석하기!
+	//	CharacterWidget->BindCharacterStat(CharacterStat); // ABCharacterWidget.cpp의 ABLOG_Long(Warning, TEXT("HPRatio : %f"), CurrentCharacterStat->GetHPRatio()); 로그를 쓰고싶을 때 주석하기!
 	}
 	else
 	{
@@ -135,7 +135,9 @@ void AABCharacter::BeginPlay()
 	auto DefaultSetting = GetDefault<UABCharacterSetting>(); // 캐릭터 세팅(로드 부분)  ini파일을 불러옴
 	if (bIsPlayer)
 	{
-		AssetIndex = 4; // 4번 인덱스의 캐릭터 에셋(플레이어용 박스 워리어)
+		auto ABPlayerState = Cast<AABPlayerState>(GetPlayerState());
+		ABCHECK(nullptr != ABPlayerState);
+		AssetIndex = ABPlayerState->GetCharacterIndex(); // 설정한 인덱스의 캐릭터 에셋(플레이어용 박스 워리어)
 	}
 	else
 	{

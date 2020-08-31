@@ -12,6 +12,7 @@ AABPlayerState::AABPlayerState()
     Exp = 0;
     GameHighScore = 0;
     SaveSlotName = TEXT("Player1"); // 세이브 슬롯 이름
+    CharacterIndex = 0;
 }
 
 int32 AABPlayerState::GetGameScore() const
@@ -37,6 +38,7 @@ void AABPlayerState::InitPlayerData()
     GameScore = 0;
     GameHighScore = ABSaveGame->HighScore;
     Exp = ABSaveGame->Exp;
+    CharacterIndex = ABSaveGame->CharacterIndex;
     SavePlayerData(); // 최초 플레이어 데이터를 생성한 후 바로 저장
 }
 
@@ -94,11 +96,17 @@ void AABPlayerState::SavePlayerData()
     NewPlayerData->Level = CharacterLevel;
     NewPlayerData->Exp = Exp;
     NewPlayerData->HighScore = GameHighScore;
+    NewPlayerData->CharacterIndex = CharacterIndex;
 
     if (!UGameplayStatics::SaveGameToSlot(NewPlayerData, SaveSlotName, 0)) // SaveSlotName(1)에 세이브 데이터 저장
     {
         ABLOG_Long(Error, TEXT("SaveGame Error!"));
     }
+}
+
+int32 AABPlayerState::GetCharacterIndex() const
+{
+    return CharacterIndex;
 }
 
 

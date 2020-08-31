@@ -28,6 +28,7 @@ public:
 	int32 GetGameHighScore() const;
 	FString SaveSlotName; // 세이브 슬롯은 1개만 생성
 	void SavePlayerData();
+	int32 GetCharacterIndex() const;
 
 protected:
 	UPROPERTY(Transient)
@@ -41,6 +42,9 @@ protected:
 
 	UPROPERTY(Transient)
 	int32 GameHighScore; // 역대 최고 스코어(우측값)
+
+	UPROPERTY(Transient)
+	int32 CharacterIndex;
 
 private:
 	void SetCharacterLevel(int32 NewCharacterLevel);

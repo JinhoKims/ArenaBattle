@@ -28,5 +28,8 @@ public:
 
 	UPROPERTY()
 	int32 HighScore;
+
+	UPROPERTY()
+	int32 CharacterIndex; // 저장할 캐릭터 모델(메시)
 	
 };

@@ -26,6 +26,7 @@ protected:
 	virtual void BeginPlay() override;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)
 	TSubclassOf<class UABHUDWidget> HUDWidgetClass;
+	virtual void SetupInputComponent() override; // 단축키 바인딩
 
 private:
 	class UABHUDWidget* HUDWidget;
@@ -33,4 +34,5 @@ private:
 	UPROPERTY()
 	class AABPlayerState* ABPlayerState;
 	
+	void OnGamePause(); // 게임 중지 
 };
