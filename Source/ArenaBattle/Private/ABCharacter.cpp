@@ -14,6 +14,7 @@
 #include "ABPlayerState.h"
 #include "ABHUDWidget.h"
 #include "ABGameMode.h"
+#include "VisualLogger/VisualLogger.h"
 
 // 초기화 및 프레임별 설정
 AABCharacter::AABCharacter()
@@ -504,7 +505,7 @@ void AABCharacter::AttackCheck() // 데미지 체크
 		FCollisionShape::MakeSphere(50.0f),
 		Params);
 
-#if ENABLE_DRAW_DEBUG
+#if ENABLE_DRAW_DEBUG // 로그 기능
 	FVector TraceVec = GetActorForwardVector() * FinalAttackRange;
 	FVector Center = GetActorLocation() + TraceVec * 0.5f;
 	float HalfHeight = FinalAttackRange * 0.5f + AttackRadius;
@@ -512,7 +513,7 @@ void AABCharacter::AttackCheck() // 데미지 체크
 	FColor DrawColor = bResult ? FColor::Green : FColor::Red;
 	float DebugLifeTime = 5.0f;
 
-	DrawDebugCapsule(GetWorld(),
+	DrawDebugCapsule(GetWorld(), // 뷰포트에 로그 출력
 		Center,
 		HalfHeight,
 		AttackRadius,
@@ -520,6 +521,9 @@ void AABCharacter::AttackCheck() // 데미지 체크
 		DrawColor,
 		false,
 		DebugLifeTime);
+
+	UE_VLOG_LOCATION(this, ArenaBattle, Verbose, GetActorLocation(), 50.0f, FColor::Blue, TEXT("Attack Position")); // 공격한 캐릭터의 위치를 비주얼 로거로 출력
+	UE_VLOG_CAPSULE(this, ArenaBattle, Verbose, GetActorLocation() - GetActorForwardVector() * AttackRadius, HalfHeight, AttackRadius, CapsuleRot, DrawColor, TEXT("Attack Area")); // 공격 판정 위치를 비주얼 로거로 출력
 #endif
 
 	if (bResult)

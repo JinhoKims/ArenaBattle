@@ -51,6 +51,4 @@ private:
 	UPROPERTY()
 	class UDataTable * ABCharacterTable;
 	
-
-	
 };
