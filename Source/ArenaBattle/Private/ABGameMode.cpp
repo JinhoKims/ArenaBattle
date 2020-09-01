@@ -12,7 +12,7 @@ AABGameMode::AABGameMode() {
 	PlayerControllerClass = AABPlayerController::StaticClass();
 	PlayerStateClass = AABPlayerState::StaticClass(); // PlayerState 클래스를 AB플레이어 스테이트로 동적할당하여 스텟정보를 가져올 수 있다.
 	GameStateClass = AABGameState::StaticClass(); // GameState 클래스를 가져온다
-	ScoreToClear = 3; // 게임 승리 조건 설정
+	ScoreToClear = 10; // 게임 승리 조건 설정
 }
 
 void AABGameMode::PostInitializeComponents()
