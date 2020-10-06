@@ -25,12 +25,12 @@ int32 AABPlayerState::GetCharacterLevel() const
     return CharacterLevel;
 }
 
-void AABPlayerState::InitPlayerData()
+void AABPlayerState::InitPlayerData() // 로그인 시 동작(필수)
 {
     auto ABSaveGame = Cast<UABSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlotName, 0));
     if (nullptr == ABSaveGame)
     {
-        ABSaveGame = GetMutableDefault<UABSaveGame>();
+        ABSaveGame = GetMutableDefault<UABSaveGame>(); // 저장 데이터 블러오기
     }
 
     SetPlayerName(ABSaveGame->PlayerName); // APlayerState에 있는 기본제공 PlayerName 변수 초기화 (닉네임)
@@ -42,14 +42,14 @@ void AABPlayerState::InitPlayerData()
     SavePlayerData(); // 최초 플레이어 데이터를 생성한 후 바로 저장
 }
 
-float AABPlayerState::GetExpratio() const // 경험치통 출력
+float AABPlayerState::GetExpratio() const // 경험치 퍼센트화
 {
     if (CurrentStatData->NextExp <= KINDA_SMALL_NUMBER)
         return 0.0f;
 
     float Result = (float)Exp / (float)CurrentStatData->NextExp;
     ABLOG_Long(Warning, TEXT("Ratio : %f, Current : %d, Next : %d"), Result, Exp, CurrentStatData->NextExp);
-    return Result; // 경험치 게이지 넘기기
+    return Result; // 0.x 으로 수치화하여 넘기기
 }
 
 bool AABPlayerState::AddExp(int32 IncomeExp) 
@@ -60,7 +60,7 @@ bool AABPlayerState::AddExp(int32 IncomeExp)
     }
 
     bool DidLevelUp = false;
-    Exp = Exp + IncomeExp;
+    Exp = Exp + IncomeExp; // 경험치 획득
     if (Exp >= CurrentStatData->NextExp)
     {
         Exp -= CurrentStatData->NextExp;
@@ -89,7 +89,7 @@ int32 AABPlayerState::GetGameHighScore() const
     return GameHighScore;
 }
 
-void AABPlayerState::SavePlayerData()
+void AABPlayerState::SavePlayerData() // 게임 저장
 {
     UABSaveGame* NewPlayerData = NewObject<UABSaveGame>(); // 동적할당 (언리얼실행환경에서 가비지 컬렉터가 마무리)
     NewPlayerData->PlayerName = GetPlayerName(); // 현재 플레이어 이름을 UABSaveGame Data에 저장
@@ -115,7 +115,7 @@ void AABPlayerState::SetCharacterLevel(int32 NewCharacterLevel)
     auto ABGameInstance = Cast<UABGameInstance>(GetGameInstance());
     ABCHECK(nullptr != ABGameInstance);
 
-    CurrentStatData = ABGameInstance->GetABCharacterData(NewCharacterLevel); // 레벨 업데이트
+    CurrentStatData = ABGameInstance->GetABCharacterData(NewCharacterLevel); // 플레이어 레벨 업데이트
     ABCHECK(nullptr != CurrentStatData);
 
     CharacterLevel = NewCharacterLevel;

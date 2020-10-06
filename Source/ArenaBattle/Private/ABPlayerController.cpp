@@ -29,7 +29,7 @@ AABPlayerController::AABPlayerController()
 	}
 }
 
-void AABPlayerController::PostInitializeComponents()
+void AABPlayerController::PostInitializeComponents() // 컨트롤러 초기화
 {
 	Super::PostInitializeComponents();
 	ABLOG_Short(Warning);

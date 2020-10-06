@@ -16,12 +16,12 @@ int32 AABGameState::GetTotalGameScore() const
 
 void AABGameState::AddGameScore()
 {
-	TotalGameScore++;
+	TotalGameScore++; // 점수 추가
 }
 
 void AABGameState::SetGameCleared()
 {
-	bGameCleared = true;
+	bGameCleared = true; // 클리어 조건 확보
 }
 
 bool AABGameState::IsGameCleared() const

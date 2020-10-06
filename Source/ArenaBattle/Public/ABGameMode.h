@@ -26,5 +26,5 @@ private:
 	class AABGameState* ABGameState;
 
 	UPROPERTY()
-	int32 ScoreToClear;
+	int32 ScoreToClear; // 점수 목표 (승리 조건)
 };

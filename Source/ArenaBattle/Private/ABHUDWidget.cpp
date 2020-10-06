@@ -43,7 +43,7 @@ void UABHUDWidget::UpdateCharacterStat() // 델리게이트에 등록할 함수
 void UABHUDWidget::UpdatePlayerState() // 델리게이트에 등록할 함수
 {
 	ABCHECK(CurrentPlayerState.IsValid()); // UI의 플레이어 경험치, 점수, 이름을 갱신
-	ExpBar->SetPercent(CurrentPlayerState->GetExpratio());
+	ExpBar->SetPercent(CurrentPlayerState->GetExpratio()); // 경험치 퍼센트(Percent)
 	PlayerName->SetText(FText::FromString(CurrentPlayerState->GetPlayerName())); // 변수 값을 HUD에 연동
 	PlayerLevel->SetText(FText::FromString(FString::FromInt(CurrentPlayerState->GetCharacterLevel()))); // 정확하지 않게 건드리면 에러나니, UI랑 꼭 일치시켜야함!
 	CurrentScore->SetText(FText::FromString(FString::FromInt(CurrentPlayerState->GetGameScore())));

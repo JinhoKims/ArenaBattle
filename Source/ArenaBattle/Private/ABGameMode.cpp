@@ -15,16 +15,17 @@ AABGameMode::AABGameMode() {
 	ScoreToClear = 10; // 게임 승리 조건 설정
 }
 
-void AABGameMode::PostInitializeComponents()
+void AABGameMode::PostInitializeComponents() // 게임 초기화
 {
 	Super::PostInitializeComponents();
-	ABGameState = Cast<AABGameState>(GameState);
+	ABLOG_Short(Error);
+	ABGameState = Cast<AABGameState>(GameState); // 승리 조건을 가져옴
 }
 
 void AABGameMode::PostLogin(APlayerController* NewPlayer) {
 	ABLOG_Long(Warning, TEXT("PostLogin Begin"));
 	Super::PostLogin(NewPlayer);
-	auto ABPlayerState = Cast<AABPlayerState>(NewPlayer->PlayerState);
+	auto ABPlayerState = Cast<AABPlayerState>(NewPlayer->PlayerState); // 플레이어 컨트롤러의 정보를 가져옴
 	ABCHECK(nullptr != ABPlayerState);
 	ABPlayerState->InitPlayerData(); // PostLogin()에서 플레이어 스텟을 초기화한다.
 	ABLOG_Long(Warning, TEXT("PostLogin End"));
