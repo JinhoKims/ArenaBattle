@@ -5,7 +5,8 @@
 
 # 
 
-![mq2](https://user-images.githubusercontent.com/55690757/98575837-09b72580-22fd-11eb-8b32-f60ad726f1d1.jpg)(https://youtu.be/2fokFcRp5Jk)
+[![Watch the video](https://user-images.githubusercontent.com/55690757/98576455-e6d94100-22fd-11eb-85af-dcca5b4f5b3b.jpg)](https://youtu.be/2fokFcRp5Jk)
+
 
 
 
