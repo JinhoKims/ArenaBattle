@@ -4,9 +4,10 @@
 만들어진 캐릭터는 자동으로 저장되어 도중에 쓰러지거나 게임을 종료해도 최근 시점으로 다시 불러올 수 있습니다. 
 
 # 인게임 화면
-![pic1](https://user-images.githubusercontent.com/55690757/84865835-d8bb2780-b0b3-11ea-94af-7c99dfaf5492.png)
-![pic2](https://user-images.githubusercontent.com/55690757/84865839-d953be00-b0b3-11ea-9187-ea3a23e5ec50.png)
-![pic3](https://user-images.githubusercontent.com/55690757/84865845-da84eb00-b0b3-11ea-9f51-0175aff76689.png)
+![ScreenShot00014](https://user-images.githubusercontent.com/55690757/98574014-c22f9a00-22fa-11eb-8fb9-28e8a93a212e.png)
+![ScreenShot00013](https://user-images.githubusercontent.com/55690757/98574039-ca87d500-22fa-11eb-8f2f-525eca6eb27b.png)
+![ScreenShot00005](https://user-images.githubusercontent.com/55690757/98574046-ccea2f00-22fa-11eb-9c7e-75e4a14ad1a0.png)
+![4](https://user-images.githubusercontent.com/55690757/98574050-ce1b5c00-22fa-11eb-94f3-8dbebefb4d87.png)
 
 # 후 기
 
