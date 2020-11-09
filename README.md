@@ -5,7 +5,7 @@
 
 # 
 <a href="https://youtu.be/2fokFcRp5Jk
-" target="_blank"><img src="http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg" 
+" target="_blank"><img src="![mq2](https://user-images.githubusercontent.com/55690757/98574876-cf00bd80-22fb-11eb-8927-e7efe66801b6.jpg)" 
 alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
 
 # 후 기
