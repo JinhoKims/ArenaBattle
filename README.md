@@ -4,7 +4,7 @@
 만들어진 캐릭터는 자동으로 저장되어 도중에 쓰러지거나 게임을 종료해도 최근 시점으로 다시 불러올 수 있습니다. 
 
 # 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=YOUTUBE_VIDEO_ID_HERE
+<a href="https://youtu.be/2fokFcRp5Jk
 " target="_blank"><img src="http://img.youtube.com/vi/YOUTUBE_VIDEO_ID_HERE/0.jpg" 
 alt="IMAGE ALT TEXT HERE" width="240" height="180" border="10" /></a>
 
