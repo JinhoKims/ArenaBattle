@@ -12,9 +12,10 @@
 [![Watch the video](https://user-images.githubusercontent.com/55690757/98576677-3b7cbc00-22fe-11eb-8cc5-16edf7dd3ba2.JPG)](https://youtu.be/2fokFcRp5Jk)
 
 
-
 ## 후 기
 
-재밌었습니다.
+UE4를 통해 게임을 제작하면서 UE4의 구조와 개념들을 익히는데 도움되었으며
+
+
 
  
