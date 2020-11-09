@@ -5,7 +5,7 @@
 
 # 
 
-[![Watch the video](https://user-images.githubusercontent.com/55690757/85987053-1a3ec180-ba28-11ea-88b9-fc342bc12120.JPG)]https://youtu.be/2fokFcRp5Jk
+![mq2](https://user-images.githubusercontent.com/55690757/98575837-09b72580-22fd-11eb-8b32-f60ad726f1d1.jpg)(https://youtu.be/2fokFcRp5Jk)
 
 
 
