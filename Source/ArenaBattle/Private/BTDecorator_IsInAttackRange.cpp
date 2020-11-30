@@ -19,10 +19,10 @@ bool UBTDecorator_IsInAttackRange::CalculateRawConditionValue(UBehaviorTreeCompo
 	if (nullptr == ControllingPawn)
 		return false;
 
-	auto Target = Cast<AABCharacter>(Ownercomp.GetBlackboardComponent()->GetValueAsObject(AABAIController::TargetKey)); // 타깃 (플레이어) 확인
+	auto Target = Cast<AABCharacter>(Ownercomp.GetBlackboardComponent()->GetValueAsObject(AABAIController::TargetKey)); // 블랙보드의 값이 타깃(플레이어)인지 확인
 	if (nullptr == Target)
 		return false;
 
-	bResult = (Target->GetDistanceTo(ControllingPawn) <= ControllingPawn->GetFinalAttackRange()); // 플레이어와의 거리가 맨손 사정거리 이하일 때 공격 모션 실행
+	bResult = (Target->GetDistanceTo(ControllingPawn) <= ControllingPawn->GetFinalAttackRange()); // 플레이어와의 거리가 맨손 사정거리 이하일 때 공격 모션 실행(true을 반환)
 	return bResult;
 }

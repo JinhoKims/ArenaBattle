@@ -23,7 +23,7 @@ void UABCharacterWidget::BindCharacterStat(UABCharacterStatComponent* NewCharact
 void UABCharacterWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	HPProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("PB_HPBar")));
+	HPProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("PB_HPBar"))); // HP 프로그래스바 객체를 위젯(PB_HPBar)와 캐스팅
 	ABCHECK(nullptr != HPProgressBar);
 	UpdateHPWidget(); // 최초로 UI 초기화 후 위젯 업데이트(초기값 상태의 체력바)
 }

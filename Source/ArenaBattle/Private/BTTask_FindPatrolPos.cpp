@@ -15,21 +15,21 @@ EBTNodeResult::Type UBTTask_FindPatrolPos::ExecuteTask(UBehaviorTreeComponent& O
 {
 	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 
-	auto ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
+	auto ControllingPawn = OwnerComp.GetAIOwner()->GetPawn(); // AI 컨트롤러가 빙의 중인 폰정보를 가져옴
 
 	if (nullptr == ControllingPawn)
-		return EBTNodeResult::Failed; // 태스크 수행 실패
+		return EBTNodeResult::Failed;
 
-	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(ControllingPawn->GetWorld());
+	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(ControllingPawn->GetWorld()); // 현재 폰의 네비게이션 정보(위치)를 가져옴
 	if (nullptr == NavSystem)
 		return EBTNodeResult::Failed;
 
-	FVector Origin = OwnerComp.GetBlackboardComponent()->GetValueAsVector(AABAIController::HomePosKey);
-	FNavLocation NextPatrol;
+	FVector Origin = OwnerComp.GetBlackboardComponent()->GetValueAsVector(AABAIController::HomePosKey); // 오리진(출발점)은 HomePosKey 좌표
+	FNavLocation NextPatrol; // 목적지 좌표값을 담고 있는 지역 변수
 
-	if (NavSystem->GetRandomPointInNavigableRadius(FVector::ZeroVector, 500.0f, NextPatrol)) // 랜덤 포인트 좌표 생성
+	if (NavSystem->GetRandomPointInNavigableRadius(FVector::ZeroVector, 500.0f, NextPatrol)) // Nexpatrol 변수에 랜덤 포인트 좌표 생성
 	{
-		OwnerComp.GetBlackboardComponent()->SetValueAsVector(AABAIController::PatrolPosKey, NextPatrol.Location);
+		OwnerComp.GetBlackboardComponent()->SetValueAsVector(AABAIController::PatrolPosKey, NextPatrol.Location); // PatrolPosKey<Key>에 NextPatrol<Value>값 기록
 		return EBTNodeResult::Succeeded;
 	}
 

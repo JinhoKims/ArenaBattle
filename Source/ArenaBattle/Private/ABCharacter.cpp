@@ -22,10 +22,11 @@ AABCharacter::AABCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// 컴포넌트 동적할당(new)
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SPRINGARM"));
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("CAMERA"));
-	CharacterStat = CreateDefaultSubobject<UABCharacterStatComponent>(TEXT("CHARACTERSTAT"));
-	HPBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPBARWIDGET"));
+	CharacterStat = CreateDefaultSubobject<UABCharacterStatComponent>(TEXT("CHARACTERSTAT")); // 캐릭터 스탯 컴포먼트는 액터 컴포넌트로 구성되있다.
+	HPBarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPBARWIDGET")); // UI 컴포넌트 부착
 
 	SpringArm->SetupAttachment(GetCapsuleComponent());
 	Camera->SetupAttachment(SpringArm);
@@ -78,6 +79,7 @@ AABCharacter::AABCharacter()
 	HPBarWidget->SetHiddenInGame(true); // UI
 	SetCanBeDamaged(false); // 데미지 판정
 	// 캐릭터 생성 전의 스테이트 : 캐릭터와 UI를 숨겨두고, 데미지를 입지 않게 한다.
+
 }
 
 void AABCharacter::PostInitializeComponents() // 델리게이트 초기화 설정
@@ -136,7 +138,7 @@ void AABCharacter::BeginPlay()
 	auto DefaultSetting = GetDefault<UABCharacterSetting>(); // 캐릭터 세팅(로드 부분)  ini파일을 불러옴
 	if (bIsPlayer)
 	{
-		auto ABPlayerState = Cast<AABPlayerState>(GetPlayerState());
+		auto ABPlayerState = Cast<AABPlayerState>(GetPlayerState()); // 이제 auto 변수는 ABPlayerState 객체가 된다.
 		ABCHECK(nullptr != ABPlayerState);
 		AssetIndex = ABPlayerState->GetCharacterIndex(); // 설정한 인덱스의 캐릭터 에셋(플레이어용 박스 워리어)
 	}
@@ -571,7 +573,7 @@ void AABCharacter::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted
 	OnAttackEnd.Broadcast();
 }
 
-float AABCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) // 캐릭터가 받은 데미지 계산
+float AABCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) // 캐릭터가 받은 피해 계산
 {																						   // ※ Instigator = 가해자 (때린 캐릭터)
 	float FinalDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (EventInstigator->IsPlayerController())
@@ -580,11 +582,11 @@ float AABCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	CharacterStat->SetDamage(FinalDamage);
 	if (CurrentState == ECharacterState::DEAD)
 	{
-		if (EventInstigator->IsPlayerController()) // 때리는 자가 플레이어일 경우
+		if (EventInstigator->IsPlayerController()) // 가해자 (때리는 자)가 플레이어일 경우, 맞는 자가 AI일 경우
 		{ 
 			auto ABPlayerControllerIsPlayer = Cast<AABPlayerController>(EventInstigator);
 			ABCHECK(nullptr != ABPlayerControllerIsPlayer, 0.0f);
-			ABPlayerControllerIsPlayer->NPCKill(this);
+			ABPlayerControllerIsPlayer->NPCKill(this); // ABPlayerControllerIsPlayer(플레이어)는 NPCKill을 호출하여 현재 캐릭터의 DropExp(사냥 경험치)를 플레이어에게 전송
 		}
 	}
 	return FinalDamage;

@@ -48,7 +48,7 @@ void UABCharacterStatComponent::SetNewLevel(int32 NewLevel) // 레벨 설정
 	if (nullptr != CurrentStatData)
 	{
 		Level = NewLevel;
-		SetHP(CurrentStatData->MaxHP);
+		SetHP(CurrentStatData->MaxHP); // 레벨업시 피회복 효과
 		CurrentHP = CurrentStatData->MaxHP;
 	}
 	else
@@ -65,11 +65,11 @@ void UABCharacterStatComponent::SetDamage(float NewDamage) // 공격(데미지) 받기
 
 void UABCharacterStatComponent::SetHP(float NewHP)
 {
-	CurrentHP = NewHP;
-	OnHPChanged.Broadcast(); // 캐릭터 hp가 변경되면 델리게이트 브로드캐스팅
+	CurrentHP = NewHP; // 받은 데미지 또는 레벨업시 회복 효과
+	OnHPChanged.Broadcast(); // 캐릭터 hp가 변경되면 HPChanged 델리게이트 브로드캐스팅
 	if (CurrentHP < KINDA_SMALL_NUMBER) // hp가 변경되던 중 피가 0 이하가 될 경우 Zero 델리게이트 호출 
 	{
-		CurrentHP = 0.0f;
+		CurrentHP = 0.0f; // 마이너스 hp를 0으로 바꿔줌
 		OnHPIsZero.Broadcast(); 
 	}
 }
