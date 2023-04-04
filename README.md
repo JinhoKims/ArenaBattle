@@ -9,7 +9,7 @@
 
 ## 플레이 영상 
 
-[![Watch the video](https://user-images.githubusercontent.com/55690757/98576677-3b7cbc00-22fe-11eb-8cc5-16edf7dd3ba2.JPG)](https://youtu.be/2fokFcRp5Jk)
+[![Watch the video](https://user-images.githubusercontent.com/55690757/98576677-3b7cbc00-22fe-11eb-8cc5-16edf7dd3ba2.JPG)](https://youtu.be/dM1Rf_50Tlw)
 
 
 ## 후 기
