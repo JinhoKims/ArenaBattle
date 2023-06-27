@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-06-27T01:39:03.095Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36" etag="fNxkB689f-ZiFBdsQ9F7" version="21.5.0" type="github">
+<mxfile host="app.diagrams.net" modified="2023-06-27T01:40:10.428Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36" etag="95_sNlbpg-DrC2nmR0aT" version="21.5.0" type="github">
   <diagram name="페이지-1" id="NF0ddqCpsUM59Y-acMz2">
     <mxGraphModel dx="1434" dy="46" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" background="#ffffff" math="0" shadow="0">
       <root>
@@ -320,6 +320,15 @@
               <mxPoint x="700" y="1810" />
             </Array>
           </mxGeometry>
+        </mxCell>
+        <mxCell id="O17rMxEZmDPRLvWxdyF2-76" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="O17rMxEZmDPRLvWxdyF2-4">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1065.5" y="1860" as="sourcePoint" />
+            <mxPoint x="890" y="1940" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="O17rMxEZmDPRLvWxdyF2-77" value="공격 사거리 안" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="1853" width="114" height="57" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
