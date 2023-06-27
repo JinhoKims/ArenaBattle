@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-06-27T01:43:23.309Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36" etag="XzJ6NCcOwjKGog-ZwyT_" version="21.5.0" type="github">
+<mxfile host="app.diagrams.net" modified="2023-06-27T01:45:17.889Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36" etag="lGSvUtIa8i_DFic1yIpw" version="21.5.0" type="github">
   <diagram name="페이지-1" id="NF0ddqCpsUM59Y-acMz2">
     <mxGraphModel dx="1434" dy="46" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" background="#ffffff" math="0" shadow="0">
       <root>
@@ -247,7 +247,7 @@
             <mxPoint x="1470" y="1780" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="O17rMxEZmDPRLvWxdyF2-48" value="감속" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;labelBackgroundColor=none;" vertex="1" parent="1">
+        <mxCell id="O17rMxEZmDPRLvWxdyF2-48" value="감속 시작" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;labelBackgroundColor=none;" vertex="1" parent="1">
           <mxGeometry x="1468" y="1750" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="O17rMxEZmDPRLvWxdyF2-49" value="플레이어를&lt;br&gt;지나치면" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;labelBackgroundColor=none;" vertex="1" parent="1">
@@ -335,6 +335,12 @@
         </mxCell>
         <mxCell id="O17rMxEZmDPRLvWxdyF2-79" value="&lt;span style=&quot;font-weight: normal;&quot;&gt;&lt;i&gt;M308 엘더 가더&lt;/i&gt;&lt;/span&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;glass=0;fontStyle=1" vertex="1" parent="1">
           <mxGeometry x="1204" y="2070" width="186" height="93" as="geometry" />
+        </mxCell>
+        <mxCell id="O17rMxEZmDPRLvWxdyF2-80" value="감속 끝나면" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;labelBackgroundColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1126" y="1620" width="114" height="57" as="geometry" />
+        </mxCell>
+        <mxCell id="O17rMxEZmDPRLvWxdyF2-81" value="공격 끝나면" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;labelBackgroundColor=none;" vertex="1" parent="1">
+          <mxGeometry x="578" y="2013" width="114" height="57" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
