@@ -1,4 +1,4 @@
-<mxfile host="app.diagrams.net" modified="2023-06-27T01:34:33.536Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36" etag="s20hewtfvsABKi3giGqZ" version="21.5.0" type="github">
+<mxfile host="app.diagrams.net" modified="2023-06-27T01:36:10.025Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36" etag="sJYZ4lICj1STyJ071fLI" version="21.5.0" type="github">
   <diagram name="페이지-1" id="NF0ddqCpsUM59Y-acMz2">
     <mxGraphModel dx="1434" dy="46" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" background="#ffffff" math="0" shadow="0">
       <root>
@@ -283,8 +283,20 @@
         <mxCell id="O17rMxEZmDPRLvWxdyF2-59" value="공격 사거리 안" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;" vertex="1" parent="1">
           <mxGeometry x="840" y="1833.5" width="114" height="57" as="geometry" />
         </mxCell>
-        <mxCell id="O17rMxEZmDPRLvWxdyF2-60" value="회전 준비 자세" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+        <mxCell id="O17rMxEZmDPRLvWxdyF2-60" value="휘두르기&lt;br&gt;준비 자세" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
           <mxGeometry x="770" y="1910" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="O17rMxEZmDPRLvWxdyF2-63" value="" style="shape=flexArrow;endArrow=classic;html=1;rounded=0;fontSize=12;startSize=8;endSize=8;curved=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="O17rMxEZmDPRLvWxdyF2-60" target="O17rMxEZmDPRLvWxdyF2-64">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="860" y="2130" as="sourcePoint" />
+            <mxPoint x="830" y="2040" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="O17rMxEZmDPRLvWxdyF2-64" value="휘두르기 공격" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="770" y="2050" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="O17rMxEZmDPRLvWxdyF2-69" value="일정시간 후" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="840" y="1980" width="114" height="57" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
